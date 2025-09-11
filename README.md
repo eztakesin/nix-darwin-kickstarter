@@ -14,6 +14,13 @@ Nix-darwin facilitates the management of your macOS system configuration and dot
 You can effortlessly revert to any previous configuration, making it a robust tool for system customization.
 Sharing configurations becomes seamless, and managing multiple macOS hosts is a breeze with nix-darwin.
 
+## Usage
+
+```
+nix build .#darwinConfigurations.macbook.system
+sudo ./result/sw/bin/darwin-rebuild switch --flake .#macbook
+```
+
 ## Showcases
 
 ## References
