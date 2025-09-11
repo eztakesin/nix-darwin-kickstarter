@@ -63,6 +63,34 @@
 
     # `brew install --cask`
     # TODO Feel free to add your favorite apps here.
-    casks = [];
+    casks = [
+      "android-platform-tools"
+      "aria2d"
+      "c0re100-qbittorrent"
+      "discord"
+      "firefox"
+      "font-awesome-terminal-fonts"
+      "font-dejavu"
+      "font-dejavu-sans-mono-nerd-font"
+      "font-fira-code-nerd-font"
+      "font-material-symbols"
+      "gimp"
+      "gnucash"
+      "google-chrome"
+      "inkscape"
+      "iina"
+      "iina+"
+      "kitty"
+      "lyx"
+      "mactex"
+      "obs"
+      "openvisualtraceroute"
+      "proton-mail-bridge"
+      "steam"
+      "thunderbird"
+      "xournal++"
+      "visual-studio-code"
+      "vlc"
+    ];
   };
 }
