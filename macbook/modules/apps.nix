@@ -50,9 +50,8 @@
     masApps = {
       # TODO Feel free to add your favorite apps here.
 
-      Xcode = 497799835;
-      # Wechat = 836500024;
-      # QQ = 451108668;
+      # Xcode = 497799835;
+      FBReader = 1067172178;
     };
 
     # taps = [];
