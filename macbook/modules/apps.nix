@@ -88,7 +88,7 @@
       "steam"
       "thunderbird"
       "xournal++"
-      "visual-studio-code"
+      # "visual-studio-code"
       "vlc"
     ];
   };

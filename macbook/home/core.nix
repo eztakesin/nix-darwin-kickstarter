@@ -1,486 +1,323 @@
-{pkgs, ...}: {
-  home.packages = with pkgs; [
-    coursera-dl
+{
+  lib,
+  pkgs,
+  ...
+}: let
+  myPython = pkgs.python312.withPackages (ps:
+    with ps; [
+      # aiohttp
+      # numpy
+      # pylint
+      # pyyaml
+      # requests
+      # toml
+      python-lsp-server
+      pylsp-mypy
+      pyls-isort
+      # python-lsp-black
+      pyls-memestra
+      pylsp-rope
+      python-lsp-ruff
+      ipykernel
+    ]);
+  lspPackages = with pkgs; [
+    rust-analyzer
+    nil # rnix-lsp
+    pyright
+    kotlin-language-server
+    nodePackages.bash-language-server
+    nodePackages.dockerfile-language-server-nodejs
+    nodePackages.eslint
+    nodePackages.graphql-language-service-cli
+    nodePackages.typescript-language-server
+    nodePackages.unified-language-server
+    nodePackages.yaml-language-server
   ];
+in {
+  home.packages = with pkgs;
+    [
+      myPython # Compiler & interpreters
+      coursera-dl
+      nix-prefetch
+    ]
+    ++ lspPackages;
 
-  programs = {
-    # modern vim
-    neovim = {
-      enable = true;
-      defaultEditor = true;
-      vimAlias = true;
-    };
-
-    # A modern replacement for ‘ls’
-    # useful in bash/zsh prompt, not in nushell.
-    eza = {
-      enable = true;
-      git = true;
-      colors = "always";
-      icons = "always";
-      enableFishIntegration = true;
-      theme = {
-        colourful = true;
-
-        filekinds = {
-          normal = { foreground = "#BAC2DE"; };
-          directory = { foreground = "#89B4FA"; };
-          symlink = { foreground = "#89DCEB"; };
-          pipe = { foreground = "#7F849C"; };
-          block_device = { foreground = "#EBA0AC"; };
-          char_device = { foreground = "#EBA0AC"; };
-          socket = { foreground = "#585B70"; };
-          special = { foreground = "#CBA6F7"; };
-          executable = { foreground = "#A6E3A1"; };
-          mount_point = { foreground = "#74C7EC"; };
-        };
-
-        perms = {
-          user_read = { foreground = "#CDD6F4"; };
-          user_write = { foreground = "#F9E2AF"; };
-          user_execute_file = { foreground = "#A6E3A1"; };
-          user_execute_other = { foreground = "#A6E3A1"; };
-          group_read = { foreground = "#BAC2DE"; };
-          group_write = { foreground = "#F9E2AF"; };
-          group_execute = { foreground = "#A6E3A1"; };
-          other_read = { foreground = "#A6ADC8"; };
-          other_write = { foreground = "#F9E2AF"; };
-          other_execute = { foreground = "#A6E3A1"; };
-          special_user_file = { foreground = "#CBA6F7"; };
-          special_other = { foreground = "#585B70"; };
-          attribute = { foreground = "#A6ADC8"; };
-        };
-
-        size = {
-          major = { foreground = "#A6ADC8"; };
-          minor = { foreground = "#89DCEB"; };
-          number_byte = { foreground = "#CDD6F4"; };
-          number_kilo = { foreground = "#BAC2DE"; };
-          number_mega = { foreground = "#89B4FA"; };
-          number_giga = { foreground = "#CBA6F7"; };
-          number_huge = { foreground = "#CBA6F7"; };
-          unit_byte = { foreground = "#A6ADC8"; };
-          unit_kilo = { foreground = "#89B4FA"; };
-          unit_mega = { foreground = "#CBA6F7"; };
-          unit_giga = { foreground = "#CBA6F7"; };
-          unit_huge = { foreground = "#74C7EC"; };
-        };
-
-        users = {
-          user_you = { foreground = "#CDD6F4"; };
-          user_root = { foreground = "#F38BA8"; };
-          user_other = { foreground = "#CBA6F7"; };
-          group_yours = { foreground = "#BAC2DE"; };
-          group_other = { foreground = "#7F849C"; };
-          group_root = { foreground = "#F38BA8"; };
-        };
-
-        links = {
-          normal = { foreground = "#89DCEB"; };
-          multi_link_file = { foreground = "#74C7EC"; };
-        };
-
-        git = {
-          new = { foreground = "#A6E3A1"; };
-          modified = { foreground = "#F9E2AF"; };
-          deleted = { foreground = "#F38BA8"; };
-          renamed = { foreground = "#94E2D5"; };
-          typechange = { foreground = "#F5C2E7"; };
-          ignored = { foreground = "#7F849C"; };
-          conflicted = { foreground = "#EBA0AC"; };
-        };
-
-        git_repo = {
-          branch_main = { foreground = "#CDD6F4"; };
-          branch_other = { foreground = "#CBA6F7"; };
-          git_clean = { foreground = "#A6E3A1"; };
-          git_dirty = { foreground = "#F38BA8"; };
-        };
-
-        security_context = {
-          colon = { foreground = "#7F849C"; };
-          user = { foreground = "#BAC2DE"; };
-          role = { foreground = "#CBA6F7"; };
-          typ = { foreground = "#585B70"; };
-          range = { foreground = "#CBA6F7"; };
-        };
-
-        file_type = {
-          image = { foreground = "#F9E2AF"; };
-          video = { foreground = "#F38BA8"; };
-          music = { foreground = "#A6E3A1"; };
-          lossless = { foreground = "#94E2D5"; };
-          crypto = { foreground = "#585B70"; };
-          document = { foreground = "#CDD6F4"; };
-          compressed = { foreground = "#F5C2E7"; };
-          temp = { foreground = "#EBA0AC"; };
-          compiled = { foreground = "#74C7EC"; };
-          build = { foreground = "#585B70"; };
-          source = { foreground = "#89B4FA"; };
-        };
-
-        punctuation = { foreground = "#7F849C"; };
-        date = { foreground = "#F9E2AF"; };
-        inode = { foreground = "#A6ADC8"; };
-        blocks = { foreground = "#9399B2"; };
-        header = { foreground = "#CDD6F4"; };
-        octal = { foreground = "#94E2D5"; };
-        flags = { foreground = "#CBA6F7"; };
-
-        symlink_path = { foreground = "#89DCEB"; };
-        control_char = { foreground = "#74C7EC"; };
-        broken_symlink = { foreground = "#F38BA8"; };
-        broken_path_overlay = { foreground = "#585B70"; };
-      };
-    };
-
-    # terminal file manager
-    yazi = {
-      enable = true;
-      enableFishIntegration = true;
-      settings = {
-        manager = {
-          show_hidden = true;
-          sort_dir_first = true;
-        };
-        theme = {
-          mgr = {
-            cwd = { fg = "#179299"; };
-
-            hovered = { fg = "#eff1f5"; bg = "#40a02b"; };
-            preview_hovered = { fg = "#eff1f5"; bg = "#4c4f69"; };
-
-            find_keyword = { fg = "#df8e1d"; italic = true; };
-            find_position = { fg = "#ea76cb"; bg = "reset"; italic = true; };
-
-            marker_copied = { fg = "#40a02b"; bg = "#40a02b"; };
-            marker_cut = { fg = "#d20f39"; bg = "#d20f39"; };
-            marker_marked = { fg = "#179299"; bg = "#179299"; };
-            marker_selected = { fg = "#40a02b"; bg = "#40a02b"; };
-
-            count_copied = { fg = "#eff1f5"; bg = "#40a02b"; };
-            count_cut = { fg = "#eff1f5"; bg = "#d20f39"; };
-            count_selected = { fg = "#eff1f5"; bg = "#40a02b"; };
-
-            border_symbol = "│";
-            border_style = { fg = "#8c8fa1"; };
-
-            syntect_theme = "~/.config/bat/themes/Catppuccin-latte.tmTheme";
-          };
-
-          tabs = {
-            active = { fg = "#eff1f5"; bg = "#4c4f69"; bold = true; };
-            inactive = { fg = "#4c4f69"; bg = "#bcc0cc"; };
-          };
-
-          mode = {
-            normal_main = { fg = "#eff1f5"; bg = "#40a02b"; bold = true; };
-            normal_alt = { fg = "#40a02b"; bg = "#ccd0da"; };
-
-            select_main = { fg = "#eff1f5"; bg = "#40a02b"; bold = true; };
-            select_alt = { fg = "#40a02b"; bg = "#ccd0da"; };
-
-            unset_main = { fg = "#eff1f5"; bg = "#dd7878"; bold = true; };
-            unset_alt = { fg = "#dd7878"; bg = "#ccd0da"; };
-          };
-
-          status = {
-            sep_left = { open = ""; close = ""; };
-            sep_right = { open = ""; close = ""; };
-
-            progress_label = { fg = "#ffffff"; bold = true; };
-            progress_normal = { fg = "#1e66f5"; bg = "#bcc0cc"; };
-            progress_error = { fg = "#d20f39"; bg = "#bcc0cc"; };
-
-            perm_type = { fg = "#1e66f5"; };
-            perm_read = { fg = "#df8e1d"; };
-            perm_write = { fg = "#d20f39"; };
-            perm_exec = { fg = "#40a02b"; };
-            perm_sep = { fg = "#8c8fa1"; };
-          };
-
-          input = {
-            border = { fg = "#40a02b"; };
-            title = { };
-            value = { };
-            selected = { reversed = true; };
-          };
-
-          pick = {
-            border = { fg = "#40a02b"; };
-            active = { fg = "#ea76cb"; };
-            inactive = { };
-          };
-
-          confirm = {
-            border = { fg = "#40a02b"; };
-            title = { fg = "#40a02b"; };
-            content = { };
-            list = { };
-            btn_yes = { reversed = true; };
-            btn_no = { };
-          };
-
-          cmp = {
-            border = { fg = "#40a02b"; };
-          };
-
-          tasks = {
-            border = { fg = "#40a02b"; };
-            title = { };
-            hovered = { underline = true; };
-          };
-
-          which = {
-            mask = { bg = "#ccd0da"; };
-            cand = { fg = "#179299"; };
-            rest = { fg = "#7c7f93"; };
-            desc = { fg = "#ea76cb"; };
-            separator = "  ";
-            separator_style = { fg = "#acb0be"; };
-          };
-
-          help = {
-            on = { fg = "#179299"; };
-            run = { fg = "#ea76cb"; };
-            desc = { fg = "#7c7f93"; };
-            hovered = { bg = "#acb0be"; bold = true; };
-            footer = { fg = "#4c4f69"; bg = "#bcc0cc"; };
-          };
-
-          notify = {
-            title_info = { fg = "#179299"; };
-            title_warn = { fg = "#df8e1d"; };
-            title_error = { fg = "#d20f39"; };
-          };
-
-          icon = {
-            files = [
-              { name = "kritadisplayrc"; text = ""; fg = "#ea76cb"; }
-              { name = ".gtkrc-2.0"; text = ""; fg = "#eff1f5"; }
-              { name = "bspwmrc"; text = ""; fg = "#4c4f69"; }
-              { name = "webpack"; text = "󰜫"; fg = "#209fb5"; }
-              { name = "tsconfig.json"; text = ""; fg = "#209fb5"; }
-              { name = ".vimrc"; text = ""; fg = "#40a02b"; }
-              { name = "gemfile$"; text = ""; fg = "#d20f39"; }
-              { name = "xmobarrc"; text = ""; fg = "#e64553"; }
-              { name = "avif"; text = ""; fg = "#7c7f93"; }
-              { name = "fp-info-cache"; text = ""; fg = "#eff1f5"; }
-              { name = ".zshrc"; text = ""; fg = "#40a02b"; }
-              { name = "robots.txt"; text = "󰚩"; fg = "#6c6f85"; }
-              { name = "dockerfile"; text = "󰡨"; fg = "#7287fd"; }
-              { name = ".git-blame-ignore-revs"; text = ""; fg = "#fe640b"; }
-              { name = ".nvmrc"; text = ""; fg = "#40a02b"; }
-              { name = "hyprpaper.conf"; text = ""; fg = "#209fb5"; }
-              { name = ".prettierignore"; text = ""; fg = "#7287fd"; }
-              { name = "rakefile"; text = ""; fg = "#d20f39"; }
-              { name = "code_of_conduct"; text = ""; fg = "#e64553"; }
-              { name = "cmakelists.txt"; text = ""; fg = "#dce0e8"; }
-              { name = ".env"; text = ""; fg = "#df8e1d"; }
-              { name = "copying.lesser"; text = ""; fg = "#40a02b"; }
-              { name = "readme"; text = "󰂺"; fg = "#eff1f5"; }
-              { name = "settings.gradle"; text = ""; fg = "#1e66f5"; }
-              { name = "gruntfile.coffee"; text = ""; fg = "#fe640b"; }
-              { name = ".eslintignore"; text = ""; fg = "#8839ef"; }
-              { name = "kalgebrarc"; text = ""; fg = "#04a5e5"; }
-              { name = "kdenliverc"; text = ""; fg = "#04a5e5"; }
-              { name = ".prettierrc.cjs"; text = ""; fg = "#7287fd"; }
-              { name = "cantorrc"; text = ""; fg = "#04a5e5"; }
-              { name = "rmd"; text = ""; fg = "#209fb5"; }
-              { name = "vagrantfile$"; text = ""; fg = "#1e66f5"; }
-              { name = ".Xauthority"; text = ""; fg = "#fe640b"; }
-              { name = "prettier.config.ts"; text = ""; fg = "#7287fd"; }
-              { name = "node_modules"; text = ""; fg = "#e64553"; }
-              { name = ".prettierrc.toml"; text = ""; fg = "#7287fd"; }
-              { name = "build.zig.zon"; text = ""; fg = "#df8e1d"; }
-              { name = ".ds_store"; text = ""; fg = "#4c4f69"; }
-              { name = "PKGBUILD"; text = ""; fg = "#04a5e5"; }
-              { name = ".prettierrc"; text = ""; fg = "#7287fd"; }
-              { name = ".bash_profile"; text = ""; fg = "#40a02b"; }
-              { name = ".npmignore"; text = ""; fg = "#e64553"; }
-              { name = ".mailmap"; text = "󰊢"; fg = "#fe640b"; }
-              { name = ".codespellrc"; text = "󰓆"; fg = "#40a02b"; }
-              { name = "svelte.config.js"; text = ""; fg = "#fe640b"; }
-              { name = "eslint.config.ts"; text = ""; fg = "#8839ef"; }
-              { name = "config"; text = ""; fg = "#7c7f93"; }
-              { name = ".gitlab-ci.yml"; text = ""; fg = "#e64553"; }
-              { name = ".gitconfig"; text = ""; fg = "#fe640b"; }
-              { name = "_gvimrc"; text = ""; fg = "#40a02b"; }
-              { name = ".xinitrc"; text = ""; fg = "#fe640b"; }
-              { name = "checkhealth"; text = "󰓙"; fg = "#04a5e5"; }
-              { name = "sxhkdrc"; text = ""; fg = "#4c4f69"; }
-              { name = ".bashrc"; text = ""; fg = "#40a02b"; }
-              { name = "tailwind.config.mjs"; text = "󱏿"; fg = "#209fb5"; }
-              { name = "ext_typoscript_setup.txt"; text = ""; fg = "#df8e1d"; }
-              { name = "commitlint.config.ts"; text = "󰜘"; fg = "#179299"; }
-              { name = "py.typed"; text = ""; fg = "#df8e1d"; }
-              { name = ".nanorc"; text = ""; fg = "#4c4f69"; }
-              { name = "commit_editmsg"; text = ""; fg = "#fe640b"; }
-              { name = ".luaurc"; text = ""; fg = "#04a5e5"; }
-              { name = "fp-lib-table"; text = ""; fg = "#eff1f5"; }
-              { name = ".editorconfig"; text = ""; fg = "#eff1f5"; }
-              { name = "justfile"; text = ""; fg = "#7c7f93"; }
-              { name = "kdeglobals"; text = ""; fg = "#04a5e5"; }
-              { name = "license.md"; text = ""; fg = "#df8e1d"; }
-              { name = ".clang-format"; text = ""; fg = "#7c7f93"; }
-              { name = "docker-compose.yaml"; text = "󰡨"; fg = "#7287fd"; }
-              { name = "copying"; text = ""; fg = "#40a02b"; }
-              { name = "go.mod"; text = ""; fg = "#209fb5"; }
-              { name = "lxqt.conf"; text = ""; fg = "#04a5e5"; }
-              { name = "brewfile"; text = ""; fg = "#d20f39"; }
-              { name = "gulpfile.coffee"; text = ""; fg = "#d20f39"; }
-              { name = ".dockerignore"; text = "󰡨"; fg = "#7287fd"; }
-              { name = ".settings.json"; text = ""; fg = "#8839ef"; }
-              { name = "tailwind.config.js"; text = "󱏿"; fg = "#209fb5"; }
-              { name = ".clang-tidy"; text = ""; fg = "#7c7f93"; }
-              { name = ".gvimrc"; text = ""; fg = "#40a02b"; }
-              { name = "nuxt.config.cjs"; text = "󱄆"; fg = "#40a02b"; }
-              { name = "xsettingsd.conf"; text = ""; fg = "#fe640b"; }
-              { name = "nuxt.config.js"; text = "󱄆"; fg = "#40a02b"; }
-              { name = "eslint.config.cjs"; text = ""; fg = "#8839ef"; }
-              { name = "sym-lib-table"; text = ""; fg = "#eff1f5"; }
-              { name = ".condarc"; text = ""; fg = "#40a02b"; }
-              { name = "xmonad.hs"; text = ""; fg = "#e64553"; }
-              { name = "tmux.conf"; text = ""; fg = "#40a02b"; }
-              { name = "xmobarrc.hs"; text = ""; fg = "#e64553"; }
-              { name = ".prettierrc.yaml"; text = ""; fg = "#7287fd"; }
-              { name = ".pre-commit-config.yaml"; text = "󰛢"; fg = "#df8e1d"; }
-              { name = "i3blocks.conf"; text = ""; fg = "#e6e9ef"; }
-              { name = "xorg.conf"; text = ""; fg = "#fe640b"; }
-              { name = ".zshenv"; text = ""; fg = "#40a02b"; }
-              { name = "vlcrc"; text = "󰕼"; fg = "#fe640b"; }
-              { name = "license"; text = ""; fg = "#df8e1d"; }
-              { name = "unlicense"; text = ""; fg = "#df8e1d"; }
-              { name = "tmux.conf.local"; text = ""; fg = "#40a02b"; }
-              { name = ".SRCINFO"; text = "󰣇"; fg = "#04a5e5"; }
-              { name = "tailwind.config.ts"; text = "󱏿"; fg = "#209fb5"; }
-              { name = "security.md"; text = "󰒃"; fg = "#bcc0cc"; }
-              { name = "security"; text = "󰒃"; fg = "#bcc0cc"; }
-              { name = ".eslintrc"; text = ""; fg = "#8839ef"; }
-              { name = "gradle.properties"; text = ""; fg = "#1e66f5"; }
-              { name = "code_of_conduct.md"; text = ""; fg = "#e64553"; }
-              { name = "PrusaSlicerGcodeViewer.ini"; text = ""; fg = "#fe640b"; }
-              { name = "PrusaSlicer.ini"; text = ""; fg = "#fe640b"; }
-              { name = "procfile"; text = ""; fg = "#7c7f93"; }
-              { name = "mpv.conf"; text = ""; fg = "#4c4f69"; }
-            ];
-
-            exts = [
-              { name = "otf"; text = ""; fg = "#eff1f5"; }
-              { name = "import"; text = ""; fg = "#eff1f5"; }
-              { name = "krz"; text = ""; fg = "#ea76cb"; }
-              { name = "adb"; text = ""; fg = "#dce0e8"; }
-              { name = "ttf"; text = ""; fg = "#eff1f5"; }
-              { name = "webpack"; text = "󰜫"; fg = "#209fb5"; }
-              { name = "dart"; text = ""; fg = "#1e66f5"; }
-              { name = "vsh"; text = ""; fg = "#7287fd"; }
-              { name = "doc"; text = "󰈬"; fg = "#1e66f5"; }
-              { name = "zsh"; text = ""; fg = "#40a02b"; }
-              { name = "ex"; text = ""; fg = "#7c7f93"; }
-              { name = "hx"; text = ""; fg = "#df8e1d"; }
-              { name = "fodt"; text = ""; fg = "#04a5e5"; }
-              { name = "mojo"; text = ""; fg = "#fe640b"; }
-              { name = "templ"; text = ""; fg = "#df8e1d"; }
-              { name = "nix"; text = ""; fg = "#04a5e5"; }
-              { name = "cshtml"; text = "󱦗"; fg = "#8839ef"; }
-              { name = "fish"; text = ""; fg = "#5c5f77"; }
-              { name = "ply"; text = "󰆧"; fg = "#8c8fa1"; }
-              { name = "sldprt"; text = "󰻫"; fg = "#40a02b"; }
-              { name = "gemspec"; text = ""; fg = "#d20f39"; }
-              { name = "mjs"; text = ""; fg = "#df8e1d"; }
-              { name = "csh"; text = ""; fg = "#5c5f77"; }
-              { name = "cmake"; text = ""; fg = "#dce0e8"; }
-              { name = "fodp"; text = ""; fg = "#df8e1d"; }
-              { name = "vi"; text = ""; fg = "#df8e1d"; }
-              { name = "msf"; text = ""; fg = "#1e66f5"; }
-              { name = "blp"; text = "󰺾"; fg = "#7287fd"; }
-              { name = "less"; text = ""; fg = "#4c4f69"; }
-              { name = "sh"; text = ""; fg = "#5c5f77"; }
-              { name = "odg"; text = ""; fg = "#eff1f5"; }
-              { name = "mint"; text = "󰌪"; fg = "#40a02b"; }
-              { name = "dll"; text = ""; fg = "#4c4f69"; }
-              { name = "odf"; text = ""; fg = "#ea76cb"; }
-              { name = "sqlite3"; text = ""; fg = "#dce0e8"; }
-              { name = "Dockerfile"; text = "󰡨"; fg = "#7287fd"; }
-              { name = "ksh"; text = ""; fg = "#5c5f77"; }
-              { name = "rmd"; text = ""; fg = "#209fb5"; }
-              { name = "wv"; text = ""; fg = "#04a5e5"; }
-              { name = "xml"; text = "󰗀"; fg = "#fe640b"; }
-              { name = "markdown"; text = ""; fg = "#4c4f69"; }
-              { name = "qml"; text = ""; fg = "#40a02b"; }
-              { name = "3gp"; text = ""; fg = "#df8e1d"; }
-              { name = "pxi"; text = ""; fg = "#04a5e5"; }
-              { name = "flac"; text = ""; fg = "#1e66f5"; }
-              { name = "gpr"; text = ""; fg = "#ea76cb"; }
-              { name = "huff"; text = "󰡘"; fg = "#8839ef"; }
-              { name = "json"; text = ""; fg = "#40a02b"; }
-              { name = "gv"; text = "󱁉"; fg = "#1e66f5"; }
-              { name = "bmp"; text = ""; fg = "#7c7f93"; }
-              { name = "lock"; text = ""; fg = "#bcc0cc"; }
-              { name = "sha384"; text = "󰕥"; fg = "#7c7f93"; }
-              { name = "cobol"; text = "⚙"; fg = "#1e66f5"; }
-              { name = "cob"; text = "⚙"; fg = "#1e66f5"; }
-              { name = "java"; text = ""; fg = "#d20f39"; }
-              { name = "cjs"; text = ""; fg = "#40a02b"; }
-              { name = "qm"; text = ""; fg = "#209fb5"; }
-              { name = "ebuild"; text = ""; fg = "#4c4f69"; }
-              { name = "mustache"; text = ""; fg = "#fe640b"; }
-              { name = "terminal"; text = ""; fg = "#40a02b"; }
-              { name = "ejs"; text = ""; fg = "#40a02b"; }
-              { name = "brep"; text = "󰻫"; fg = "#40a02b"; }
-              { name = "rar"; text = ""; fg = "#df8e1d"; }
-              { name = "gradle"; text = ""; fg = "#1e66f5"; }
-              { name = "gnumakefile"; text = ""; fg = "#7c7f93"; }
-              { name = "applescript"; text = ""; fg = "#7c7f93"; }
-              { name = "elm"; text = ""; fg = "#209fb5"; }
-              { name = "ebook"; text = ""; fg = "#df8e1d"; }
-              { name = "kra"; text = ""; fg = "#ea76cb"; }
-              { name = "tf"; text = ""; fg = "#8839ef"; }
-              { name = "xls"; text = "󰈛"; fg = "#40a02b"; }
-              { name = "fnl"; text = ""; fg = "#eff1f5"; }
-              { name = "kdbx"; text = ""; fg = "#40a02b"; }
-              { name = "kicad_pcb"; text = ""; fg = "#eff1f5"; }
-              { name = "cfg"; text = ""; fg = "#7c7f93"; }
-              { name = "ape"; text = ""; fg = "#04a5e5"; }
-              { name = "org"; text = ""; fg = "#179299"; }
-              { name = "yml"; text = ""; fg = "#7c7f93"; }
-              { name = "swift"; text = ""; fg = "#fe640b"; }
-              { name = "eln"; text = ""; fg = "#7c7f93"; }
-              { name = "sol"; text = ""; fg = "#209fb5"; }
-              { name = "awk"; text = ""; fg = "#5c5f77"; }
-              { name = "7z"; text = ""; fg = "#df8e1d"; }
-              { name = "apl"; text = "⍝"; fg = "#df8e1d"; }
-              { name = "epp"; text = ""; fg = "#df8e1d"; }
-              { name = "app"; text = ""; fg = "#d20f39"; }
-              { name = "dot"; text = "󱁉"; fg = "#1e66f5"; }
-              { name = "kpp"; text = ""; fg = "#ea76cb"; }
-              { name = "eot"; text = ""; fg = "#eff1f5"; }
-              { name = "hpp"; text = ""; fg = "#7c7f93"; }
-              { name = "spec.tsx"; text = ""; fg = "#1e66f5"; }
-              { name = "hurl"; text = ""; fg = "#e64553"; }
-              { name = "cxxm"; text = ""; fg = "#209fb5"; }
-              { name = "c"; text = ""; fg = "#7287fd"; }
-              { name = "fcmacro"; text = ""; fg = "#d20f39"; }
-              { name = "sass"; text = ""; fg = "#dd7878"; }
-              { name = "yaml"; text = ""; fg = "#7c7f93"; }
-              { name = "xz"; text = ""; fg = "#df8e1d"; }
-              { name = "material"; text = "󰔉"; fg = "#ea76cb"; }
-              { name = "json5"; text = ""; fg = "#40a02b"; }
-              { name = "signature"; text = "λ"; fg = "#fe640b"; }
-              { name = "3mf"; text = "󰆧"; fg = "#8c8fa1"; }
-              { name = "jpg"; text = ""; fg = "#7c7f93"; }
-              { name = "xpi"; text = ""; fg = "#fe640b"; }
-            ];
-          };
-        };
-      };
-    };
-
-    # skim provides a single executable: sk.
-    # Basically anywhere you would want to use grep, try sk instead.
-    skim = {
-      enable = true;
-      enableBashIntegration = true;
-    };
+  # install VS Code via Home Manager
+  programs.vscode = {
+    enable = true;
+    profiles.default.extensions = with pkgs.vscode-extensions;
+      [
+        rust-lang.rust-analyzer                  # Advanced Rust language server
+        ms-python.python                         # Core Python support (debugging, IntelliSense, etc.)
+        njpwerner.autodocstring                  # Auto-generates Python docstrings
+        ms-toolsai.jupyter-renderers             # Rich output renderers for Jupyter
+        graphql.vscode-graphql                   # GraphQL syntax highlighting and tooling
+        prisma.prisma                            # Prisma schema language support
+        cweijan.vscode-database-client2          # GUI client for SQL/NoSQL databases
+        esbenp.prettier-vscode                   # Code formatter using Prettier
+        davidanson.vscode-markdownlint           # Linter for Markdown files
+        gencer.html-slim-scss-css-class-completion # Class name auto-completion for HTML/SCSS
+        styled-components.vscode-styled-components # Syntax highlighting for styled-components
+        gruntfuggly.todo-tree                    # Highlights TODOs/FIXMEs in a tree view
+        pkief.material-icon-theme                # Material Design icons for files/folders
+        ms-vscode.hexeditor                      # Hex editor for binary files
+        streetsidesoftware.code-spell-checker    # Spell checker for source code and comments
+        ms-vscode.anycode                        # Basic IntelliSense for unsupported languages
+        wix.vscode-import-cost                   # Shows size of imported packages inline
+        christian-kohler.path-intellisense       # Auto-completes file paths in import statements
+        alexdima.copy-relative-path              # Adds command to copy relative file path
+      ]
+      ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
+        # bbenoist.nix                             # Basic syntax highlighting for Nix
+        # jnoortheen.nix-ide                       # Full IDE support for Nix
+        # kamadorueda.alejandra                    # Formatter for Nix using Alejandra
+        # golang.go                                # Official Go extension with full tooling
+        # zxh404.vscode-proto3                     # Protocol Buffers (.proto) support
+        # ms-python.vscode-pylance                 # Fast Python language server with type checking
+        # ms-python.isort                          # Automatically sorts Python imports
+        # ms-python.black-formatter                # Formats Python code using Black
+        # ms-toolsai.jupyter                       # Jupyter notebook support
+        # ms-toolsai.jupyter-keymap                # Jupyter keyboard shortcuts
+        # tamasfe.even-better-toml                 # TOML support with formatting and validation
+        # zainchen.json                            # JSON formatting and validation tools
+        # ms-vscode.cmake-tools                    # CMake support for C++ projects
+        # timonwong.shellcheck                     # Shell script linting with ShellCheck
+        # foxundermoon.shell-format                # Formatter for shell scripts
+        # editorconfig.editorconfig                # Enforces .editorconfig settings
+        # dbaeumer.vscode-eslint                   # JavaScript/TypeScript linting with ESLint
+        # donjayamanne.githistory                  # View Git file history and logs
+        # mhutchie.git-graph                       # Visual Git graph viewer
+        # codezombiech.gitignore                   # .gitignore support with templates
+        # oderwat.indent-rainbow                   # Colorizes indentation levels
+        # shardulm94.trailing-spaces               # Highlights trailing whitespace
+        # mechatroner.rainbow-csv                  # Colorizes CSV/TSV files
+        # yzhang.markdown-all-in-one               # All-in-one Markdown support
+        # bierner.markdown-checkbox                # Checkbox support in Markdown
+        # bierner.markdown-mermaid                 # Mermaid diagram support in Markdown
+        # bradlc.vscode-tailwindcss                # IntelliSense and linting for Tailwind CSS
+        # catppuccin.catppuccin-vsc                # Catppuccin color theme
+        # bierner.emojisense                       # Emoji auto-completion
+        # irongeek.vscode-env                      # Syntax highlighting and support for .env files
+        # eg2.vscode-npm-script                    # Run/manage npm scripts from VSCode
+        # firefox-devtools.vscode-firefox-debug    # Debug web apps using Firefox
+        # bodil.file-browser                       # File browser sidebar
+        # rioj7.commandonallfiles                  # Run commands on all files in workspace
+        {
+          name = "nix";
+          publisher = "bbenoist";
+          version = "1.0.1";
+          sha256 = "sha256-qwxqOGublQeVP2qrLF94ndX/Be9oZOn+ZMCFX1yyoH0=";
+        }
+        {
+          name = "emojisense";
+          publisher = "bierner";
+          version = "0.10.0";
+          sha256 = "sha256-PD8edYuJu6QHPYIM08kV85LuKh0H0/MIgFmMxSJFK5M=";
+        }
+        {
+          name = "markdown-checkbox";
+          publisher = "bierner";
+          version = "0.4.0";
+          sha256 = "sha256-AoPcdN/67WOzarnF+GIx/nans38Jan8Z5D0StBWIbkk=";
+        }
+        {
+          name = "markdown-mermaid";
+          publisher = "bierner";
+          version = "1.28.0";
+          sha256 = "sha256-NAQD6DK1c13nA/O0QHNxFraImE6C0+Jzj9+f06EkiW0=";
+        }
+        {
+          name = "file-browser";
+          publisher = "bodil";
+          version = "0.2.11";
+          sha256 = "sha256-yPVhhsAUZxnlhj58fXkk+yhxop2q7YJ6X4W9dXGKJfo=";
+        }
+        {
+          name = "vscode-tailwindcss";
+          publisher = "bradlc";
+          version = "0.14.26";
+          sha256 = "sha256-agntfMsLAYASviH7Wuw/W8JwfHRi6qAfuMkqmFWT0bg=";
+        }
+        {
+          name = "catppuccin-vsc";
+          publisher = "catppuccin";
+          version = "3.18.0";
+          sha256 = "sha256-57c0HRdEABLz03qozeQgFJH1NaWUbA+7tDJv0V4At8M=";
+        }
+        {
+          name = "gitignore";
+          publisher = "codezombiech";
+          version = "0.10.0";
+          sha256 = "sha256-WTKVHrhBeAocP+stskFsSFtd0aR3u1TTEMYtdxj1tlY=";
+        }
+        {
+          name = "vscode-eslint";
+          publisher = "dbaeumer";
+          version = "3.0.19";
+          sha256 = "sha256-rpYgvo5H1RBviV5L/pfDWqVXIYaZonRiqh4TLFGEODw=";
+        }
+        {
+          name = "githistory";
+          publisher = "donjayamanne";
+          version = "0.6.20";
+          sha256 = "sha256-nEdYS9/cMS4dcbFje23a47QBZr9eDK3dvtkFWqA+OHU=";
+        }
+        {
+          name = "editorconfig";
+          publisher = "editorconfig";
+          version = "0.17.4";
+          sha256 = "sha256-MYPYhSKAxgaZ0UijxU+xiO4HDPLtXGymhN+2YmTev8M=";
+        }
+        {
+          name = "vscode-npm-script";
+          publisher = "eg2";
+          version = "0.3.29";
+          sha256 = "sha256-k6DtmhYBj7mg8SUU3pg+ezRzWvhiECqYQVj9LDhhV4I=";
+        }
+        {
+          name = "vscode-firefox-debug";
+          publisher = "firefox-devtools";
+          version = "2.15.0";
+          sha256 = "sha256-hBj0V42k32dj2gvsNStUBNZEG7iRYxeDMbuA15AYQqk=";
+        }
+        {
+          name = "shell-format";
+          publisher = "foxundermoon";
+          version = "7.2.8";
+          sha256 = "sha256-Z3vmRzqPCxkQbn39I54bh/ND+0HcE9iFUhKQ29GRd7o=";
+        }
+        {
+          name = "go";
+          publisher = "golang";
+          version = "0.51.0";
+          sha256 = "sha256-aZ60+PHDnYwPxuEDtS5otjxFIs4d3J7hw12xblb8ujY=";
+        }
+        {
+          name = "vscode-env";
+          publisher = "irongeek";
+          version = "0.1.0";
+          sha256 = "sha256-URq90lOFtPCNfSIl2NUwihwRQyqgDysGmBc3NG7o7vk=";
+        }
+        {
+          name = "nix-ide";
+          publisher = "jnoortheen";
+          version = "0.4.22";
+          sha256 = "sha256-j3V03Aa1mHO9rny3/hXmDbs3fmruqyzNzwFjiOlnaMU=";
+        }
+        {
+          name = "alejandra";
+          publisher = "kamadorueda";
+          version = "1.0.0";
+          sha256 = "sha256-COlEjKhm8tK5XfOjrpVUDQ7x3JaOLiYoZ4MdwTL8ktk=";
+        }
+        {
+          name = "rainbow-csv";
+          publisher = "mechatroner";
+          version = "3.21.0";
+          sha256 = "sha256-IPgPE5vM9tzHPioRBZeJs4hqut6t++SjZJlHnz/ismA=";
+        }
+        {
+          name = "git-graph";
+          publisher = "mhutchie";
+          version = "1.30.0";
+          sha256 = "sha256-sHeaMMr5hmQ0kAFZxxMiRk6f0mfjkg2XMnA4Gf+DHwA=";
+        }
+        {
+          name = "black-formatter";
+          publisher = "ms-python";
+          version = "2025.3.11831009";
+          sha256 = "sha256-FsJHxYHae1NuDXQfOJ4TPnXDy05tTuyCElHD4MiaMDU=";
+        }
+        {
+          name = "isort";
+          publisher = "ms-python";
+          version = "2025.1.12271015";
+          sha256 = "sha256-AaHhcre3t758C22mEMjA7fT/egWzcDG/TDQCINhF8Rw=";
+        }
+        {
+          name = "vscode-pylance";
+          publisher = "ms-python";
+          version = "2025.7.104";
+          sha256 = "sha256-PQq6N6BVJr55TN91xVrI9ikjLBXWOZqU8hWYzivFJTk=";
+        }
+        {
+          name = "jupyter";
+          publisher = "ms-toolsai";
+          version = "2025.8.2025082701";
+          sha256 = "sha256-iwyl/59C56UdBD+wxyBMDjd/epr0gLaMDXV8btuICco=";
+        }
+        {
+          name = "jupyter-keymap";
+          publisher = "ms-toolsai";
+          version = "1.1.2";
+          sha256 = "sha256-9BLyBZzZ0Z6QQ05QSxFJYNZmZDc5O3eYkCxe/UsmKws=";
+        }
+        {
+          name = "vscode-jupyter-cell-tags";
+          publisher = "ms-toolsai";
+          version = "0.1.9";
+          sha256 = "sha256-XODbFbOr2kBTzFc0JtjiDUcCDBX1Hd4uajlil7mhqPY=";
+        }
+        {
+          name = "vscode-jupyter-slideshow";
+          publisher = "ms-toolsai";
+          version = "0.1.6";
+          sha256 = "sha256-fnsMrrcYdz6BzUWMd9pAOQGTjmtEbQeoVYG20VWxCsM=";
+        }
+        {
+          name = "cmake-tools";
+          publisher = "ms-vscode";
+          version = "1.22.9";
+          sha256 = "sha256-49zRJSH0mEff8I19QedLH/TdlfL7O8n08meZMEJVabs=";
+        }
+        {
+          name = "indent-rainbow";
+          publisher = "oderwat";
+          version = "8.3.1";
+          sha256 = "sha256-dOicya0B2sriTcDSdCyhtp0Mcx5b6TUaFKVb0YU3jUc=";
+        }
+        {
+          name = "commandonallfiles";
+          publisher = "rioj7";
+          version = "0.6.0";
+          sha256 = "sha256-fPN1bQY96a0bnuq3OeUQTeI67uvPFYPnE6+fKYngUcU=";
+        }
+        {
+          name = "trailing-spaces";
+          publisher = "shardulm94";
+          version = "0.4.1";
+          sha256 = "sha256-pLE1bfLRxjlm/kgU9nmtiPBOnP05giQnWq6bexrrIZY=";
+        }
+        {
+          name = "even-better-toml";
+          publisher = "tamasfe";
+          version = "0.21.2";
+          sha256 = "sha256-IbjWavQoXu4x4hpEkvkhqzbf/NhZpn8RFdKTAnRlCAg=";
+        }
+        {
+          name = "shellcheck";
+          publisher = "timonwong";
+          version = "0.38.3";
+          sha256 = "sha256-qDispRN7jRIIsP+5lamyR+sNoOwTwl+55QftzO7WBm4=";
+        }
+        {
+          name = "markdown-all-in-one";
+          publisher = "yzhang";
+          version = "3.6.3";
+          sha256 = "sha256-xJhbFQSX1DDDp8iE/R8ep+1t5IRusBkvjHcNmvjrboM=";
+        }
+        {
+          name = "json";
+          publisher = "zainchen";
+          version = "2.0.2";
+          sha256 = "sha256-nC3Q8KuCtn/jg1j/NaAxWGvnKe/ykrPm2PUjfsJz8aI=";
+        }
+        {
+          name = "vscode-proto3";
+          publisher = "zxh404";
+          version = "0.5.5";
+          sha256 = "sha256-Em+w3FyJLXrpVAe9N7zsHRoMcpvl+psmG1new7nA8iE=";
+        }
+      ];
   };
 }
