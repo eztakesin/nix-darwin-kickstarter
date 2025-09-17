@@ -35,7 +35,8 @@ set extensions \
   eg2.vscode-npm-script \
   firefox-devtools.vscode-firefox-debug \
   bodil.file-browser \
-  rioj7.commandonallfiles
+  rioj7.commandonallfiles \
+  dnicolson.binary-plist
 
 # Detect VSCode command (code or code-insiders)
 if type -q code

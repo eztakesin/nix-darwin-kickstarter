@@ -318,6 +318,12 @@ in {
           version = "0.5.5";
           sha256 = "sha256-Em+w3FyJLXrpVAe9N7zsHRoMcpvl+psmG1new7nA8iE=";
         }
+        {
+          name = "binary-plist";
+          publisher = "dnicolson";
+          version = "0.11.5";
+          sha256 = "sha256-OHauc8YiCF/LybLlzKcj6GLxEJS/skkQIlqlJsuRdmY=";
+        }
       ];
   };
 }
