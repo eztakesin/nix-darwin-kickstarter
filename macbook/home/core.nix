@@ -5,12 +5,12 @@
 }: let
   myPython = pkgs.python312.withPackages (ps:
     with ps; [
-      # aiohttp
-      # numpy
-      # pylint
-      # pyyaml
-      # requests
-      # toml
+      aiohttp
+      numpy
+      pylint
+      pyyaml
+      requests
+      toml
       python-lsp-server
       pylsp-mypy
       pyls-isort
@@ -19,6 +19,7 @@
       pylsp-rope
       python-lsp-ruff
       ipykernel
+      weaviate-client
     ]);
   lspPackages = with pkgs; [
     rust-analyzer
@@ -39,6 +40,7 @@ in {
       myPython # Compiler & interpreters
       coursera-dl
       nix-prefetch
+      veaviate
     ]
     ++ lspPackages;
 
