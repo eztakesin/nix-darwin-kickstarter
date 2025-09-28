@@ -19,7 +19,6 @@
       pylsp-rope
       python-lsp-ruff
       ipykernel
-      weaviate-client
     ]);
   lspPackages = with pkgs; [
     rust-analyzer
@@ -40,7 +39,7 @@ in {
       myPython # Compiler & interpreters
       coursera-dl
       nix-prefetch
-      veaviate
+      weaviate
     ]
     ++ lspPackages;
 
