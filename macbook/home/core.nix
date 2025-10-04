@@ -30,7 +30,6 @@
     nodePackages.eslint
     nodePackages.graphql-language-service-cli
     nodePackages.typescript-language-server
-    nodePackages.unified-language-server
     nodePackages.yaml-language-server
   ];
 in {
