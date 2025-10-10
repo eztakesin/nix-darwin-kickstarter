@@ -8,9 +8,6 @@
   #
   ##########################################################################
 
-  # Allow unfree packages
-  nixpkgs.config.allowUnfree = true;
-
   # Install packages from nix's official package repository.
   #
   # The packages installed here are available to all users, and are reproducible across machines, and are rollbackable.

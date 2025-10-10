@@ -11,20 +11,19 @@
     # the nixConfig here only affects the flake itself, not the system configuration!
     nixConfig = {
         substituters = [
-        # Query the the official cache.
-        "https://cache.nixos.org"
+            # Query the the official cache.
+            "https://cache.nixos.org"
         ];
     };
 
     # This is the standard format for flake.nix. `inputs` are the dependencies of the flake,
     # Each item in `inputs` will be passed as a parameter to the `outputs` function after being pulled and built.
     inputs = {
-        nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
-        nixpkgs-unstable.url = github:NixOS/nixpkgs/nixpkgs-unstable;
+        nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
         darwin = {
             url = "github:lnl7/nix-darwin/master";
-            inputs.nixpkgs.follows = "nixpkgs-unstable";
+            inputs.nixpkgs.follows = "nixpkgs";
         };
 
         # home-manager, used for managing user configuration
@@ -33,7 +32,17 @@
             # The `follows` keyword in inputs is used for inheritance.
             # Here, `inputs.nixpkgs` of home-manager is kept consistent with the `inputs.nixpkgs` of the current flake,
             # to avoid problems caused by different versions of nixpkgs dependencies.
-            inputs.nixpkgs.follows = "nixpkgs-unstable";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
+
+        darwin-emacs = {
+            url = "github:nix-giant/nix-darwin-emacs";
+            inputs.nixpkgs.follows = "nixpkgs";
+        };
+
+        darwin-emacs-packages = {
+            url = "github:nix-community/emacs-overlay";
+            inputs.nixpkgs.follows = "nixpkgs";
         };
     };
 
@@ -47,6 +56,8 @@
         nixpkgs,
         darwin,
         home-manager,
+        darwin-emacs,
+        darwin-emacs-packages,
         ...
     }: let
         # TODO replace with your own username, email, system, and hostname
@@ -55,10 +66,21 @@
         system = "aarch64-darwin"; # aarch64-darwin or x86_64-darwin
         hostname = "macbook";
 
+        overlays = [
+            darwin-emacs.overlays.emacs
+            darwin-emacs-packages.overlays.package
+        ];
+
+        pkgs = import nixpkgs {
+            system = system;
+            overlays = overlays;
+            config.allowUnfree = true;
+        };
+
         specialArgs =
             inputs
             // {
-                inherit username useremail hostname;
+                inherit pkgs username useremail hostname;
             };
     in {
         darwinConfigurations."${hostname}" = darwin.lib.darwinSystem {
@@ -73,10 +95,10 @@
             # home manager
             home-manager.darwinModules.home-manager
             {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.extraSpecialArgs = specialArgs;
-            home-manager.users.${username} = import ./home;
+                home-manager.useGlobalPkgs = true;
+                home-manager.useUserPackages = true;
+                home-manager.extraSpecialArgs = specialArgs;
+                home-manager.users.${username} = import ./home;
             }
         ];
     };
