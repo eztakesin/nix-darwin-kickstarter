@@ -47,7 +47,7 @@ in {
     enable = true;
     profiles.default.extensions = with pkgs.vscode-extensions;
       [
-        rust-lang.rust-analyzer                  # Advanced Rust language server
+        # rust-lang.rust-analyzer                  # Advanced Rust language server
         ms-python.python                         # Core Python support (debugging, IntelliSense, etc.)
         njpwerner.autodocstring                  # Auto-generates Python docstrings
         ms-toolsai.jupyter-renderers             # Rich output renderers for Jupyter
@@ -244,7 +244,7 @@ in {
           name = "jupyter";
           publisher = "ms-toolsai";
           version = "2025.8.2025082701";
-          sha256 = "sha256-iwyl/59C56UdBD+wxyBMDjd/epr0gLaMDXV8btuICco=";
+          sha256 = "sha256-H5Xu7aWH5odsfnhdeLF6WpeCdN7yJ0+wpU+h/cqnxTE=";
         }
         {
           name = "jupyter-keymap";
