@@ -27,6 +27,13 @@
             url = "github:nix-community/emacs-overlay";
             inputs.nixpkgs.follows = "nixpkgs";
         };
+
+        twist.url = "github:emacs-twist/twist.nix";
+
+        emacs-config = {
+            url = "github:klchen0112/emacs-config-package";
+            inputs.twist.follows = "twist";
+        };
     };
 
     outputs = inputs @ {
@@ -36,6 +43,7 @@
         home-manager,
         darwin-emacs,
         darwin-emacs-packages,
+        emacs-config,
         ...
     }: let
         # System info
@@ -73,27 +81,38 @@
 
         # Special args passed to all modules
         specialArgs = inputs // {
-            inherit pkgs system hostname username useremail my;
+            inherit inputs pkgs system hostname username useremail my;
         };
 
     in {
         darwinConfigurations.${hostname} = darwin.lib.darwinSystem {
             inherit system specialArgs;
 
-        modules = [
-            ./modules/nix-core.nix
-            ./modules/system.nix
-            ./modules/apps.nix
-            ./modules/host-users.nix
+            modules = [
+                ./modules/nix-core.nix
+                ./modules/system.nix
+                ./modules/apps.nix
+                ./modules/host-users.nix
 
-            home-manager.darwinModules.home-manager {
-                home-manager.useGlobalPkgs = true;
-                home-manager.useUserPackages = true;
-                home-manager.extraSpecialArgs = specialArgs;
-                home-manager.users.${username} = import ./home;
-            }
-        ];
-    };
+                home-manager.darwinModules.home-manager {
+                    home-manager.useGlobalPkgs = true;
+                    home-manager.useUserPackages = true;
+                    home-manager.extraSpecialArgs = specialArgs;
+                    home-manager.users.${username} = {
+                        imports = [
+                            # inputs.twist.homeModules.emacs-twist
+                            ./home
+                        ];
+                        # programs.emacs-twist = {
+                        #     enable = true;
+                        #     emacsclient.enable = true;
+                        #     createInitFile = true;
+                        #     config = inputs.emacs-config;
+                        # };
+                    };
+                }
+            ];
+        };
 
         formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;
     } ;
