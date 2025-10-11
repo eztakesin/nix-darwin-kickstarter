@@ -21,7 +21,7 @@
       linkPersonal = path: link "storage/personal/${path}";
     in {
       ".emacs.d" = {
-        source = ./emacs;
+        source = ../overlays/emacs;
         recursive = true;
       };
     };

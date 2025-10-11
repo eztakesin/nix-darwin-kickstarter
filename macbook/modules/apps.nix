@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, my, ... }:
 {
   ##########################################################################
   #
@@ -21,6 +21,7 @@
     neovim
     git
     just # use Justfile to simplify nix-darwin's commands
+    emacs-overlays
   ];
   environment.variables.EDITOR = "nvim";
 

@@ -481,35 +481,7 @@
 
     emacs = {
       enable = true;
-      package = (pkgs.emacsWithPackagesFromUsePackage {
-        config = let
-          readRecursively = dir:
-            builtins.concatStringsSep "\n"
-            (lib.mapAttrsToList (name: value:
-              if value == "regular"
-              then builtins.readFile (dir + "/${name}")
-              else
-                (
-                  if value == "directory"
-                  then readRecursively (dir + "/${name}")
-                  else []
-                ))
-            (builtins.readDir dir));
-        in
-          readRecursively ./emacs;
-        package = pkgs.emacs-unstable;
-
-        extraEmacsPackages = epkgs: [
-          epkgs.use-package
-        ];
-
-        # Optionally override derivations.
-        # override = final: prev // {
-        #   weechat = prev.melpaPackages.weechat.overrideAttrs(old: {
-        #     patches = [ ./weechat-el.patch ];
-        #   });
-        # };
-      });
+      package = pkgs.emacs-overlays;
     };
   };
 }
