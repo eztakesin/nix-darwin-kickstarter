@@ -36,7 +36,6 @@
         home-manager,
         darwin-emacs,
         darwin-emacs-packages,
-        emacs-config,
         ...
     }: let
         # System info
