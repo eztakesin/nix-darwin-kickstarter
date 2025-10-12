@@ -19,6 +19,15 @@
       pylsp-rope
       python-lsp-ruff
       ipykernel
+      epc
+      sexpdata
+      sex
+      pynput
+      pyobjc-core
+      six
+      inflect
+      pyqt6
+      pyqt6-sip
     ]);
   lspPackages = with pkgs; [
     rust-analyzer
@@ -39,6 +48,7 @@ in {
       coursera-dl
       nix-prefetch
       weaviate
+      deno
     ]
     ++ lspPackages;
 

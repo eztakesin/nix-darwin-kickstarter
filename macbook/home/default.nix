@@ -20,10 +20,10 @@
       link = path: config.lib.file.mkOutOfStoreSymlink "${home}/${path}";
       linkPersonal = path: link "storage/personal/${path}";
     in {
-      # ".emacs.d" = {
-      #   source = ../overlays/emacs;
-      #   recursive = true;
-      # };
+      ".emacs.d" = {
+        source = ../overlays/emacs;
+        recursive = true;
+      };
     };
 
     # Add to home managers dag to make sure the activation fails if emacs can't
