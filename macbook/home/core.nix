@@ -310,7 +310,7 @@ in {
           name = "shellcheck";
           publisher = "timonwong";
           version = "0.38.3";
-          sha256 = "sha256-SwX685EWy+EtxGCMxEARA1oIfV45J0jB/P5a+UsVdAM=";
+          sha256 = "sha256-qDispRN7jRIIsP+5lamyR+sNoOwTwl+55QftzO7WBm4=";
         }
         {
           name = "markdown-all-in-one";
