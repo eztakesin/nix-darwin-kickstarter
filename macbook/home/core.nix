@@ -232,7 +232,7 @@ in {
           name = "debugpy";
           publisher = "ms-python";
           version = "2025.15.2025101002";
-          sha256 = "sha256-VjskzTsDKrIR2SLP6h+rp1m8DddCexmi/Itm6eiiW3s=";
+          sha256 = "sha256-M2G1CviSdwex7DX6ug8yN2aVgVGPy+eSmS5sOjFOSPQ=";
         }
         {
           name = "isort";
