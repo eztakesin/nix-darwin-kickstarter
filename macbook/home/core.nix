@@ -123,8 +123,8 @@ in {
         {
           name = "markdown-mermaid";
           publisher = "bierner";
-          version = "1.28.0";
-          sha256 = "sha256-NAQD6DK1c13nA/O0QHNxFraImE6C0+Jzj9+f06EkiW0=";
+          version = "1.29.0";
+          sha256 = "sha256-qjfZ2/otO2BAIbhjqicHI2H0KKdpji55K+2XfOrzUIw=";
         }
         {
           name = "file-browser";
@@ -135,8 +135,8 @@ in {
         {
           name = "vscode-tailwindcss";
           publisher = "bradlc";
-          version = "0.14.26";
-          sha256 = "sha256-agntfMsLAYASviH7Wuw/W8JwfHRi6qAfuMkqmFWT0bg=";
+          version = "0.14.28";
+          sha256 = "sha256-xq12b0i0TsYZ5XxF1t9c2YrV7wAROjEjdLgBg3ZaLi0=";
         }
         {
           name = "catppuccin-vsc";
@@ -157,6 +157,12 @@ in {
           sha256 = "sha256-rpYgvo5H1RBviV5L/pfDWqVXIYaZonRiqh4TLFGEODw=";
         }
         {
+          name = "binary-plist";
+          publisher = "dnicolson";
+          version = "1.0.2";
+          sha256 = "sha256-asImm92AZjL10/f/+pimoTNdkqZBnMmrGQiTyJU/NL8=";
+        }
+        {
           name = "githistory";
           publisher = "donjayamanne";
           version = "0.6.20";
@@ -167,12 +173,6 @@ in {
           publisher = "editorconfig";
           version = "0.17.4";
           sha256 = "sha256-MYPYhSKAxgaZ0UijxU+xiO4HDPLtXGymhN+2YmTev8M=";
-        }
-        {
-          name = "vscode-npm-script";
-          publisher = "eg2";
-          version = "0.3.29";
-          sha256 = "sha256-k6DtmhYBj7mg8SUU3pg+ezRzWvhiECqYQVj9LDhhV4I=";
         }
         {
           name = "vscode-firefox-debug";
@@ -201,8 +201,8 @@ in {
         {
           name = "nix-ide";
           publisher = "jnoortheen";
-          version = "0.4.22";
-          sha256 = "sha256-j3V03Aa1mHO9rny3/hXmDbs3fmruqyzNzwFjiOlnaMU=";
+          version = "0.5.0";
+          sha256 = "sha256-jVuGQzMspbMojYq+af5fmuiaS3l3moG8L8Kyf40vots=";
         }
         {
           name = "alejandra";
@@ -213,8 +213,8 @@ in {
         {
           name = "rainbow-csv";
           publisher = "mechatroner";
-          version = "3.21.0";
-          sha256 = "sha256-IPgPE5vM9tzHPioRBZeJs4hqut6t++SjZJlHnz/ismA=";
+          version = "3.23.0";
+          sha256 = "sha256-HEbx7vjuVFjAG0koFI/JRehivRiLBF0cgx24LhdwCBc=";
         }
         {
           name = "git-graph";
@@ -229,22 +229,34 @@ in {
           sha256 = "sha256-FsJHxYHae1NuDXQfOJ4TPnXDy05tTuyCElHD4MiaMDU=";
         }
         {
+          name = "debugpy";
+          publisher = "ms-python";
+          version = "2025.15.2025101002";
+          sha256 = "sha256-VjskzTsDKrIR2SLP6h+rp1m8DddCexmi/Itm6eiiW3s=";
+        }
+        {
           name = "isort";
           publisher = "ms-python";
-          version = "2025.1.12271015";
-          sha256 = "sha256-AaHhcre3t758C22mEMjA7fT/egWzcDG/TDQCINhF8Rw=";
+          version = "2025.1.12731007";
+          sha256 = "sha256-/eAN5oc4y4KTzvjGoU0Kx0u4nUxmndldoMqzPv4K2fM=";
         }
         {
           name = "vscode-pylance";
           publisher = "ms-python";
-          version = "2025.7.104";
-          sha256 = "sha256-PQq6N6BVJr55TN91xVrI9ikjLBXWOZqU8hWYzivFJTk=";
+          version = "2025.8.100";
+          sha256 = "sha256-af3+jXXmkcEyalyWS35Lz0fMrDZ//eRteU/0LXRaf/k=";
+        }
+        {
+          name = "vscode-python-envs";
+          publisher = "ms-python";
+          version = "1.11.12821635";
+          sha256 = "sha256-5IgfXE96iCjzlYFTLF75bLT4Nc5geFwwRIQ3rBKKZr8=";
         }
         {
           name = "jupyter";
           publisher = "ms-toolsai";
-          version = "2025.8.2025082701";
-          sha256 = "sha256-H5Xu7aWH5odsfnhdeLF6WpeCdN7yJ0+wpU+h/cqnxTE=";
+          version = "2025.10.2025101002";
+          sha256 = "sha256-As5sEhkxW6nkHsfzMSUc7C+oP1zMVoduk+E6euhmSYU=";
         }
         {
           name = "jupyter-keymap";
@@ -267,8 +279,8 @@ in {
         {
           name = "cmake-tools";
           publisher = "ms-vscode";
-          version = "1.22.9";
-          sha256 = "sha256-49zRJSH0mEff8I19QedLH/TdlfL7O8n08meZMEJVabs=";
+          version = "1.22.14";
+          sha256 = "sha256-gxO77qDTNeY/49JtRQ0VQ+HO2ECK1pCuSRQbNiEIn5s=";
         }
         {
           name = "indent-rainbow";
@@ -298,7 +310,7 @@ in {
           name = "shellcheck";
           publisher = "timonwong";
           version = "0.38.3";
-          sha256 = "sha256-qDispRN7jRIIsP+5lamyR+sNoOwTwl+55QftzO7WBm4=";
+          sha256 = "sha256-SwX685EWy+EtxGCMxEARA1oIfV45J0jB/P5a+UsVdAM=";
         }
         {
           name = "markdown-all-in-one";
@@ -317,12 +329,6 @@ in {
           publisher = "zxh404";
           version = "0.5.5";
           sha256 = "sha256-Em+w3FyJLXrpVAe9N7zsHRoMcpvl+psmG1new7nA8iE=";
-        }
-        {
-          name = "binary-plist";
-          publisher = "dnicolson";
-          version = "0.11.5";
-          sha256 = "sha256-OHauc8YiCF/LybLlzKcj6GLxEJS/skkQIlqlJsuRdmY=";
         }
       ];
   };
