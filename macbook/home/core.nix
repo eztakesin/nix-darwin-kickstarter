@@ -21,7 +21,6 @@
       ipykernel
       epc
       sexpdata
-      pynput
       pyobjc-core
       six
       inflect
