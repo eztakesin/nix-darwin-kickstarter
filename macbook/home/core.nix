@@ -47,6 +47,7 @@ in {
       nix-prefetch
       weaviate
       deno
+      lunarvim
     ]
     ++ lspPackages;
 
