@@ -85,7 +85,7 @@ final: prev: {
       epkgs.visual-regexp
       epkgs.vundo
       epkgs.websocket
-      epkgs.ws-butler
+      # epkgs.ws-butler
       epkgs.xterm-color
       epkgs.yasnippet
       epkgs.yasnippet-snippets
