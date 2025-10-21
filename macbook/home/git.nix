@@ -27,7 +27,7 @@
       }
     ];
 
-    extraConfig = {
+    settings = {
       # User & signing.
       # TODO replace with your own name & email
       user.name = "eztakesin";
@@ -63,6 +63,27 @@
       init.defaultBranch = "main";
       push.autoSetupRemote = true;
       advice.detachedHead = false;
+
+      aliases = {
+        # common aliases
+        br = "branch";
+        cmt = "commit -m";
+        ca = "commit --amend -m";
+        co = "checkout";
+        cp = "cherry-pick";
+        d = "diff";
+        dc = "diff --cached";
+        dt = "difftool";
+        ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
+        ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
+        mt = "mergetool";
+        st = "status";
+        sub = "submodule";
+
+        # aliases for submodule
+        update = "submodule update --init --recursive";
+        foreach = "submodule foreach";
+      };
     };
 
     # signing = {
@@ -76,27 +97,6 @@
     #     features = "side-by-side";
     #   };
     # };
-
-    aliases = {
-      # common aliases
-      br = "branch";
-      cmt = "commit -m";
-      ca = "commit --amend -m";
-      co = "checkout";
-      cp = "cherry-pick";
-      d = "diff";
-      dc = "diff --cached";
-      dt = "difftool";
-      ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
-      ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
-      mt = "mergetool";
-      st = "status";
-      sub = "submodule";
-
-      # aliases for submodule
-      update = "submodule update --init --recursive";
-      foreach = "submodule foreach";
-    };
   };
 
   # programs.gh.enable = true;

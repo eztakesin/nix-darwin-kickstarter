@@ -56,7 +56,7 @@ in {
     enable = true;
     profiles.default.extensions = with pkgs.vscode-extensions;
       [
-        # rust-lang.rust-analyzer                  # Advanced Rust language server
+        rust-lang.rust-analyzer                  # Advanced Rust language server
         ms-python.python                         # Core Python support (debugging, IntelliSense, etc.)
         njpwerner.autodocstring                  # Auto-generates Python docstrings
         ms-toolsai.jupyter-renderers             # Rich output renderers for Jupyter
