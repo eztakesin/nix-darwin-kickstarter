@@ -162,6 +162,7 @@
 
       # Virtualization & Emulation
       "qemu" # Hardware virtualization and emulation tool
+      "python"
     ];
 
     # `brew install --cask`
@@ -196,6 +197,7 @@
       "vlc"
       "battery"
       "nuclear"
+      "whisky"
     ];
   };
 }
