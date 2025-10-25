@@ -27,7 +27,7 @@ final: prev: {
       epkgs.f
       epkgs.goto-line-preview
       epkgs.gptel
-      epkgs.holo-layer
+      # epkgs.holo-layer
       epkgs.inf-ruby
       epkgs.isearch-mb
       epkgs.json-reformat
