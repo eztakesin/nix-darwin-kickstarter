@@ -198,6 +198,8 @@
       "battery"
       "nuclear"
       "whisky"
+      "zoom"
+      "microsoft-teams"
     ];
   };
 }
