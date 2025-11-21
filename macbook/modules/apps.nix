@@ -21,7 +21,7 @@
     neovim
     git
     just # use Justfile to simplify nix-darwin's commands
-    emacs-overlays
+    # emacs-overlays
   ];
   environment.variables.EDITOR = "nvim";
 
@@ -195,7 +195,6 @@
       "xournal++"
       # "visual-studio-code"
       "vlc"
-      "battery"
       "nuclear"
       "whisky"
       "zoom"

@@ -265,7 +265,7 @@ in {
           name = "jupyter";
           publisher = "ms-toolsai";
           version = "2025.10.2025101002";
-          sha256 = "sha256-PaOzMP+4pi6Fppq1VbT3/3nsCt4lmJISidNK8uQutQ4=";
+          sha256 = "sha256-As5sEhkxW6nkHsfzMSUc7C+oP1zMVoduk+E6euhmSYU=";
         }
         {
           name = "jupyter-keymap";
