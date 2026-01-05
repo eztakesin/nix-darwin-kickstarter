@@ -479,9 +479,9 @@
       enableBashIntegration = true;
     };
 
-    # emacs = {
-    #   enable = true;
-    #   package = pkgs.emacs-overlays;
-    # };
+    emacs = {
+      enable = true;
+      package = pkgs.emacs-overlays;
+    };
   };
 }

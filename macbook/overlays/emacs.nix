@@ -32,7 +32,7 @@ final: prev: {
       epkgs.isearch-mb
       epkgs.json-reformat
       epkgs.json-snatcher
-      epkgs.lsp-bridge
+      # epkgs.lsp-bridge
       epkgs.move-text
       epkgs.olivetti
       epkgs.cider
