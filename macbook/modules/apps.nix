@@ -178,8 +178,6 @@
       "font-dejavu-sans-mono-nerd-font"
       "font-fira-code-nerd-font"
       "font-material-symbols"
-      "gimp"
-      "gnucash"
       "google-chrome"
       "inkscape"
       "iina"
@@ -196,7 +194,6 @@
       # "visual-studio-code"
       "vlc"
       "nuclear"
-      "whisky"
       "zoom"
       "microsoft-teams"
     ];
