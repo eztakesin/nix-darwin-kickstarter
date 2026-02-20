@@ -38,6 +38,123 @@
     nodePackages.graphql-language-service-cli
     nodePackages.typescript-language-server
     nodePackages.yaml-language-server
+    ccls
+    lua-language-server
+    stylua
+    yamlfmt
+    topiary
+    fish-lsp
+    vscode-langservers-extracted
+  ];
+
+  # CLI tools migrated from Homebrew to Nix
+  cliPackages = with pkgs; [
+    # Networking
+    aria2
+    wget
+    rclone
+    mtr
+    nmap
+
+    # Neovim / Lazyman dependencies
+    ripgrep # rg - required by telescope.nvim
+    fd # fd - required by telescope.nvim
+    nodejs # required by many LSPs and neovim plugins
+    tree-sitter # treesitter CLI for parser compilation
+
+    # Shell & Terminal
+    bat
+    bat-extras.batgrep
+    bat-extras.batman
+    bat-extras.batdiff
+    bat-extras.batpipe
+    bat-extras.batwatch
+    bat-extras.prettybat
+    btop
+    lsd
+    tree
+    tmux
+    less
+    fzf
+    procs
+    pv
+    figlet
+    lolcat
+    glow
+    trash-cli
+    rich-cli
+    pwgen
+    tailspin
+    neovim-remote
+
+    # Development
+    gh
+    git-lfs
+    delta # git-delta
+    lazygit
+    go
+    rustc
+    cargo
+    cargo-edit
+    cargo-outdated
+    pipx
+    uv
+    pnpm
+    luarocks
+    mkcert
+    caddy
+
+    # File & Archive
+    atool
+    p7zip
+    unar
+    unzip
+    lzop
+    lrzip
+    pngcrush
+    rsync
+    file
+    poppler-utils
+    djvulibre
+    librsvg
+    imagemagick
+    pandoc
+
+    # System Utilities
+    gdu
+    smartmontools
+    moreutils
+
+    # File Managers
+    ranger
+    joshuto
+
+    # Text Browsers
+    lynx
+    w3m
+
+    # Media
+    mpv
+    gnuplot
+
+    # Container & Virtualization
+    qemu
+
+    # AI
+    gemini-cli
+
+    # Misc
+    awscli2
+    jaq
+    hyfetch
+    tealdeer
+    gnused
+    uutils-coreutils
+    uutils-diffutils
+    uutils-findutils
+    ripgrep-all
+    clipboard-jh
+    ascii-image-converter
   ];
 in {
   home.packages = with pkgs;
@@ -49,7 +166,8 @@ in {
       deno
       lunarvim
     ]
-    ++ lspPackages;
+    ++ lspPackages
+    ++ cliPackages;
 
   # install VS Code via Home Manager
   programs.vscode = {
