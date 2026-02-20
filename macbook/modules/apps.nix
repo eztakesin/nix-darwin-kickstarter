@@ -70,7 +70,7 @@
       "julia" # Julia programming language (not available in nixpkgs for aarch64-darwin)
       "qbittorrent-cli" # CLI interface for qBittorrent (not available in nixpkgs for aarch64-darwin)
       "github-markdown-toc" # Generate table of contents for Markdown files
-      "pidof" # Find process IDs by name
+      # pidof: replaced by procs (nix) — use `procs --filter name=xxx`
       "composer" # PHP dependency manager
       "repo" # Google's tool for managing multiple Git repositories
       "gpatch" # GNU patch tool for applying diffs
@@ -123,10 +123,10 @@
       "antigravity"
       "antigravity-tools"
       "inkscape"
-      "kitty"
+      # kitty is managed by nix (environment.systemPackages)
       "lyx"
       "xournal++"
-      "openvisualtraceroute"
+      # openvisualtraceroute: replaced by trippy (nix)
       "protonvpn"
       "sikarugir"
       "steam"

@@ -73,7 +73,7 @@
     btop
     lsd
     tree
-    tmux
+    zellij # tmux 替代（Rust，支持浮动窗格/插件）
     less
     fzf
     procs
@@ -105,12 +105,10 @@
     caddy
 
     # File & Archive
-    atool
+    ouch # 统一压缩解压（Rust，自动识别格式）
     p7zip
     unar
     unzip
-    lzop
-    lrzip
     pngcrush
     rsync
     file
@@ -121,7 +119,7 @@
     pandoc
 
     # System Utilities
-    gdu
+    dust # du 替代（Rust，磁盘占用可视化）
     smartmontools
     moreutils
 
@@ -143,6 +141,13 @@
     # AI
     gemini-cli
 
+    # Networking (Rust)
+    xh # curl 替代（Rust，彩色输出、JSON 友好）
+    trippy # mtr 替代（Rust，网络诊断 TUI）
+    gping # ping 替代（Rust，实时图表）
+    rustscan # nmap 辅助（Rust，快速端口扫描）
+    bandwhich # iftop 替代（Rust，按进程显示网络流量）
+
     # Misc
     awscli2
     jaq
@@ -155,6 +160,7 @@
     ripgrep-all
     clipboard-jh
     ascii-image-converter
+    zoxide # 智能 cd（记住常用路径，z foo 直接跳）
   ];
 in {
   home.packages = with pkgs;
@@ -162,7 +168,6 @@ in {
       myPython # Compiler & interpreters
       coursera-dl
       nix-prefetch
-      weaviate
       deno
       lunarvim
     ]
