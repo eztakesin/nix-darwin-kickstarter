@@ -60,6 +60,10 @@
             darwin-emacs.overlays.emacs
             darwin-emacs-packages.overlays.package
             (import ./overlays/emacs.nix)
+            # deno checkPhase bug: test target named "integration_test" not "integration_tests"
+            (final: prev: {
+                deno = prev.deno.overrideAttrs (old: { doCheck = false; });
+            })
         ];
 
         # pkgs with overlays
