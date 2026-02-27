@@ -7,6 +7,10 @@
     ./git.nix
     ./programs.nix
     ./starship.nix
+    ./fish.nix
+    ./kitty.nix
+    ./bat.nix
+    ./gh.nix
   ];
 
   # Home Manager needs a bit of information about you and the
@@ -24,6 +28,37 @@
         source = ../overlays/emacs;
         recursive = true;
       };
+
+      # aria2 config (symlinked into ~/.aria2/)
+      ".aria2/aria2.conf" = {
+        source = ../dotfiles/aria2/aria2.conf;
+      };
+      ".aria2/trackers-list-aria2.sh" = {
+        source = ../dotfiles/aria2/trackers-list-aria2.sh;
+        executable = true;
+      };
+
+      # hyfetch config
+      ".config/hyfetch.json" = {
+        source = ../dotfiles/hyfetch.json;
+      };
+
+      # Firefox user-overrides.js (for arkenfox)
+      # NOTE: After first Firefox launch, you need to:
+      # 1. Find your profile dir: about:profiles
+      # 2. Clone arkenfox user.js into the profile dir
+      # 3. Symlink or copy this file there
+      # 4. Run: ./updater.sh && ./prefsCleaner.sh
+      ".config/firefox-user-overrides.js" = {
+        source = ../dotfiles/firefox/user-overrides.js;
+      };
+
+      # Wallpaper
+      "Pictures/wallpaper.png" = {
+        source = ../dotfiles/wallpapers/wallpaper.png;
+      };
+
+
     };
 
     # Add to home managers dag to make sure the activation fails if emacs can't
