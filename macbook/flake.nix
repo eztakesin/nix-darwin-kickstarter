@@ -64,6 +64,17 @@
             (final: prev: {
                 deno = prev.deno.overrideAttrs (old: { doCheck = false; });
             })
+            # jeepney: installCheckPhase requires dbus which is unavailable on macOS
+            (final: prev: {
+                python313Packages = prev.python313Packages.override {
+                    overrides = pfinal: pprev: {
+                        jeepney = pprev.jeepney.overrideAttrs (old: {
+                            doInstallCheck = false;
+                            pythonImportsCheck = [];
+                        });
+                    };
+                };
+            })
         ];
 
         # pkgs with overlays
@@ -101,6 +112,7 @@
                 home-manager.darwinModules.home-manager {
                     home-manager.useGlobalPkgs = true;
                     home-manager.useUserPackages = true;
+                    home-manager.backupFileExtension = "backup";
                     home-manager.extraSpecialArgs = specialArgs;
                     home-manager.users.${username} = {
                         imports = [
