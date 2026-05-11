@@ -24,10 +24,10 @@
       link = path: config.lib.file.mkOutOfStoreSymlink "${home}/${path}";
       linkPersonal = path: link "storage/personal/${path}";
     in {
-      ".emacs.d" = {
-        source = ../overlays/emacs;
-        recursive = true;
-      };
+      # ".emacs.d" = {
+      #   source = ../overlays/emacs;
+      #   recursive = true;
+      # };
 
       # aria2 config (symlinked into ~/.aria2/)
       ".aria2/aria2.conf" = {
@@ -64,10 +64,10 @@
     # Add to home managers dag to make sure the activation fails if emacs can't
     # parse the init files and nuke any temp dirs we don't need/want to stick
     # around if present.
-    activation.freshEmacs = lib.hm.dag.entryAfter ["writeBoundary"] ''
-      printf "home/default.nix: clean ~/.emacs.d\n" >&2
-      run rm -rf $VERBOSE_ARG ~/.emacs.d/init.el ~/.emacs.d/init.elc ~/.emacs.d/elpa ~/.emacs.d/eln-cache
-    '';
+    # activation.freshEmacs = lib.hm.dag.entryAfter ["writeBoundary"] ''
+    #   printf "home/default.nix: clean ~/.emacs.d\n" >&2
+    #   run rm -rf $VERBOSE_ARG ~/.emacs.d/init.el ~/.emacs.d/init.elc ~/.emacs.d/elpa ~/.emacs.d/eln-cache
+    # '';
 
     # This value determines the Home Manager release that your
     # configuration is compatible with. This helps avoid breakage

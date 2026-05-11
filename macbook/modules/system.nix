@@ -97,9 +97,9 @@
         };
         "com.apple.finder" = {
           ShowExternalHardDrivesOnDesktop = true;
-          ShowHardDrivesOnDesktop = true;
-          ShowMountedServersOnDesktop = true;
-          ShowRemovableMediaOnDesktop = true;
+          # ShowHardDrivesOnDesktop = true;
+          # ShowMountedServersOnDesktop = true;
+          # ShowRemovableMediaOnDesktop = true;
           _FXSortFoldersFirst = true;
           # When performing a search, search the current folder by default
           FXDefaultSearchScope = "SCcf";
@@ -125,7 +125,7 @@
         #   askForPasswordDelay = 0;
         # };
         "com.apple.screencapture" = {
-          location = "~/Desktop";
+          location = "~/Pictures";
           type = "png";
         };
         "com.apple.AdLib" = {

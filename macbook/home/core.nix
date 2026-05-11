@@ -32,12 +32,12 @@
     nil # rnix-lsp
     pyright
     kotlin-language-server
-    nodePackages.bash-language-server
-    nodePackages.dockerfile-language-server-nodejs
-    nodePackages.eslint
-    nodePackages.graphql-language-service-cli
-    nodePackages.typescript-language-server
-    nodePackages.yaml-language-server
+    # nodePackages.bash-language-server
+    # nodePackages.dockerfile-language-server-nodejs
+    # nodePackages.eslint
+    # nodePackages.graphql-language-service-cli
+    # nodePackages.typescript-language-server
+    # nodePackages.yaml-language-server
     ccls
     lua-language-server
     stylua
@@ -149,7 +149,7 @@
     bandwhich # iftop 替代（Rust，按进程显示网络流量）
 
     # Misc
-    awscli2
+    # awscli2
     jaq
     hyfetch
     tealdeer
@@ -166,10 +166,10 @@ in {
   home.packages = with pkgs;
     [
       myPython # Compiler & interpreters
-      coursera-dl
+      # coursera-dl
       nix-prefetch
       deno
-      lunarvim
+      # lunarvim
     ]
     ++ lspPackages
     ++ cliPackages;

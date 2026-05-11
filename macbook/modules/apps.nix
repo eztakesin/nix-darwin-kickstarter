@@ -17,8 +17,8 @@
     starship
     neovim
     git
-    just # use Justfile to simplify nix-darwin's commands
-    emacs-overlays
+    # just # use Justfile to simplify nix-darwin's commands
+    # emacs-overlays
   ];
   environment.variables.EDITOR = "nvim";
 
@@ -36,7 +36,7 @@
     };
 
     masApps = {
-      FBReader = 1067172178;
+      # FBReader = 1067172178;
     };
 
     # `brew install`
@@ -101,8 +101,8 @@
 
       # Development
       "claude-code"
-      "dbeaver-community"
-      "sqlcl"
+      # "dbeaver-community"
+      # "sqlcl"
       "temurin"
       # VS Code is managed by home-manager (see home/core.nix)
 
@@ -121,15 +121,15 @@
 
       # Productivity & Utilities
       "antigravity"
-      "antigravity-tools"
+      # "antigravity-tools"
       "inkscape"
       # kitty is managed by nix (environment.systemPackages)
-      "lyx"
+      # "lyx"
       "xournal++"
       # openvisualtraceroute: replaced by trippy (nix)
       "protonvpn"
-      "sikarugir"
-      "steam"
+      # "sikarugir"
+      # "steam"
 
       # Fonts
       "font-awesome-terminal-fonts"
