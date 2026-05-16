@@ -154,6 +154,8 @@
       "font-source-han-sans-vf"
       "font-source-han-serif-vf"
       "font-source-sans-3"
+      "font-klee-one"
+      "font-yusei-magic"
     ];
   };
 }
