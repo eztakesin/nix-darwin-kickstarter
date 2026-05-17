@@ -21,9 +21,9 @@
     neovim
     git
     alejandra
-    gnupg
-    yubikey-personalization
-    pinentry_mac
+    # gnupg              # moved to home-manager (home/gpg.nix → programs.gpg.enable)
+    # yubikey-personalization  # legacy ykpersonalize; modern equivalent is `ykman` (brew)
+    # pinentry_mac       # owned by home/gpg.nix via home.packages
     # just # use Justfile to simplify nix-darwin's commands
     # emacs-overlays
   ];
@@ -55,12 +55,13 @@
     brews = [
       # macOS-Specific
       "mas" # Mac App Store CLI
-      "pinentry-mac" # GUI pin entry dialog for GPG on macOS
+      # "pinentry-mac" # duplicate — owned by home/gpg.nix (nix-store version)
       "ideviceinstaller" # Install apps on iOS devices
       "bash-completion@2" # Programmable completion for Bash 4+
 
       # Hardware & Security (better macOS integration via brew)
-      "pcsc-lite" # Middleware for smart card support
+      # "pcsc-lite" # disabled — collides with macOS's built-in PCSC (CryptoTokenKit)
+                    # and can cause YubiKey "card error" issues. macOS PCSC is sufficient.
       "ykman" # YubiKey Manager CLI
       "ykpers" # YubiKey personalization tool
 

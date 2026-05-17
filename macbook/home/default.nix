@@ -5,6 +5,7 @@
   imports = [
     ./core.nix
     ./git.nix
+    ./gpg.nix
     ./programs.nix
     ./starship.nix
     ./fish.nix

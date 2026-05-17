@@ -3,6 +3,7 @@
   pkgs,
   username,
   useremail,
+  my,
   ...
 }: {
   # `programs.git` will generate the config file: ~/.config/git/config
@@ -29,10 +30,13 @@
 
     settings = {
       # User & signing.
-      # TODO replace with your own name & email
+      # Email must match a UID on the GPG key (qwquq@proton.me) AND a
+      # verified email on the GitHub account, otherwise GitHub marks
+      # commits as Unverified even though the signature is real.
       user.name = "eztakesin";
-      user.email = "amatoki@shiohara.me";
-      # user.signingKey = my.gpg.fingerprint;
+      user.email = "qwquq@proton.me";
+      user.signingKey = my.gpg.fingerprint;
+      commit.gpgSign = true;
       tag.gpgSign = true;
 
       # Pull.
