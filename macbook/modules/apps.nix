@@ -1,5 +1,8 @@
-{ pkgs, my, ... }:
 {
+  pkgs,
+  my,
+  ...
+}: {
   ##########################################################################
   #
   #  Install all apps and packages here.
@@ -18,12 +21,15 @@
     neovim
     git
     alejandra
+    gnupg
+    yubikey-personalization
+    pinentry_mac
     # just # use Justfile to simplify nix-darwin's commands
     # emacs-overlays
   ];
   environment.variables.EDITOR = "nvim";
 
-  environment.shells = with pkgs; [ fish ];
+  environment.shells = with pkgs; [fish];
 
   # Homebrew: only for packages that don't work well with Nix on macOS
   homebrew = {

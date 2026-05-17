@@ -3,7 +3,7 @@
   pkgs,
   ...
 }: let
-  myPython = pkgs.python313.withPackages (ps:
+  myPython = pkgs.python314.withPackages (ps:
     with ps; [
       aiohttp
       numpy
@@ -179,25 +179,25 @@ in {
     enable = true;
     profiles.default.extensions = with pkgs.vscode-extensions;
       [
-        rust-lang.rust-analyzer                  # Advanced Rust language server
-        ms-python.python                         # Core Python support (debugging, IntelliSense, etc.)
-        njpwerner.autodocstring                  # Auto-generates Python docstrings
-        ms-toolsai.jupyter-renderers             # Rich output renderers for Jupyter
-        graphql.vscode-graphql                   # GraphQL syntax highlighting and tooling
-        prisma.prisma                            # Prisma schema language support
-        cweijan.vscode-database-client2          # GUI client for SQL/NoSQL databases
-        esbenp.prettier-vscode                   # Code formatter using Prettier
-        davidanson.vscode-markdownlint           # Linter for Markdown files
+        rust-lang.rust-analyzer # Advanced Rust language server
+        ms-python.python # Core Python support (debugging, IntelliSense, etc.)
+        njpwerner.autodocstring # Auto-generates Python docstrings
+        ms-toolsai.jupyter-renderers # Rich output renderers for Jupyter
+        graphql.vscode-graphql # GraphQL syntax highlighting and tooling
+        prisma.prisma # Prisma schema language support
+        cweijan.vscode-database-client2 # GUI client for SQL/NoSQL databases
+        esbenp.prettier-vscode # Code formatter using Prettier
+        davidanson.vscode-markdownlint # Linter for Markdown files
         gencer.html-slim-scss-css-class-completion # Class name auto-completion for HTML/SCSS
         styled-components.vscode-styled-components # Syntax highlighting for styled-components
-        gruntfuggly.todo-tree                    # Highlights TODOs/FIXMEs in a tree view
-        pkief.material-icon-theme                # Material Design icons for files/folders
-        ms-vscode.hexeditor                      # Hex editor for binary files
-        streetsidesoftware.code-spell-checker    # Spell checker for source code and comments
-        ms-vscode.anycode                        # Basic IntelliSense for unsupported languages
-        wix.vscode-import-cost                   # Shows size of imported packages inline
-        christian-kohler.path-intellisense       # Auto-completes file paths in import statements
-        alexdima.copy-relative-path              # Adds command to copy relative file path
+        gruntfuggly.todo-tree # Highlights TODOs/FIXMEs in a tree view
+        pkief.material-icon-theme # Material Design icons for files/folders
+        ms-vscode.hexeditor # Hex editor for binary files
+        streetsidesoftware.code-spell-checker # Spell checker for source code and comments
+        ms-vscode.anycode # Basic IntelliSense for unsupported languages
+        wix.vscode-import-cost # Shows size of imported packages inline
+        christian-kohler.path-intellisense # Auto-completes file paths in import statements
+        alexdima.copy-relative-path # Adds command to copy relative file path
       ]
       ++ pkgs.vscode-utils.extensionsFromVscodeMarketplace [
         # bbenoist.nix                             # Basic syntax highlighting for Nix
