@@ -17,6 +17,7 @@
     starship
     neovim
     git
+    alejandra
     # just # use Justfile to simplify nix-darwin's commands
     # emacs-overlays
   ];
