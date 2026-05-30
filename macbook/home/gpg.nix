@@ -12,7 +12,7 @@
     # with deviations annotated below.
     settings = {
       # Identity
-      default-key = my.gpg.fingerprint;
+      default-key = my.gpg.personal.fingerprint;
 
       # Algorithm preferences
       personal-cipher-preferences = "AES256 AES192 AES";
@@ -85,7 +85,7 @@
     enable-ssh-support
   '';
 
-  home.packages = [ pkgs.pinentry_mac ];
+  home.packages = [pkgs.pinentry_mac];
 
   # Wire up the SSH agent socket so ssh/git automatically use gpg-agent.
   # Also export GPG_TTY so pinentry knows where to draw the TTY prompt
@@ -120,7 +120,7 @@
             return 1
         end
         set -l out "$in".(date +%s).enc
-        gpg --encrypt --armor --output $out -r ${my.gpg.fingerprint} -- $in
+        gpg --encrypt --armor --output $out -r ${my.gpg.personal.fingerprint} -- $in
         and echo "$in -> $out"
       '';
     };
@@ -140,6 +140,14 @@
         end
         gpg --decrypt --output $out -- $in
         and echo "$in -> $out"
+      '';
+    };
+
+    yk-swap = {
+      description = "After physically swapping YubiKeys, force gpg to re-detect";
+      body = ''
+        gpgconf --kill scdaemon
+        gpg --card-status
       '';
     };
   };

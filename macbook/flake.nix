@@ -75,6 +75,21 @@
                     };
                 };
             })
+            # pipx: upstream tests assert on PEP 508 spec whitespace ("nox@URL" vs
+            # "nox @ URL"); breaks with newer packaging lib. Skip checks.
+            # Must override at the python3 interpreter level: `pkgs.pipx` is
+            # `python3.pkgs.toPythonApplication python3.pkgs.pipx`, so the
+            # checkPhase runs inside `python3.pkgs.pipx`, not the top-level
+            # wrapper. Overriding `pkgs.pipx` only patches the wrapper.
+            (final: prev: {
+                python3 = prev.python3.override (old: {
+                    packageOverrides = pself: psuper: {
+                        pipx = psuper.pipx.overridePythonAttrs (_: {
+                            doCheck = false;
+                        });
+                    };
+                });
+            })
         ];
 
         # pkgs with overlays
