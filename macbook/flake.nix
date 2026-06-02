@@ -90,6 +90,16 @@
                     };
                 });
             })
+            # highlight: nixpkgs carries shellscript-crash-fix.patch but upstream
+            # already merged it into 4.20, so the patch fails with "Reversed (or
+            # previously applied) patch detected". Drop it.
+            (final: prev: {
+                highlight = prev.highlight.overrideAttrs (old: {
+                    patches = builtins.filter
+                        (p: builtins.match ".*shellscript-crash-fix.*" (toString p) == null)
+                        (old.patches or []);
+                });
+            })
         ];
 
         # pkgs with overlays
