@@ -59,7 +59,7 @@
     # Neovim / Lazyman dependencies
     ripgrep # rg - required by telescope.nvim
     fd # fd - required by telescope.nvim
-    nodejs # required by many LSPs and neovim plugins
+    nodejs_latest # required by many LSPs and neovim plugins
     tree-sitter # treesitter CLI for parser compilation
 
     # Shell & Terminal
@@ -152,6 +152,7 @@
     # awscli2
     jaq
     hyfetch
+    neofetch
     tealdeer
     gnused
     uutils-coreutils
