@@ -26,6 +26,7 @@
     # pinentry_mac       # owned by home/gpg.nix via home.packages
     # just # use Justfile to simplify nix-darwin's commands
     # emacs-overlays
+    easylpac
   ];
   environment.variables.EDITOR = "nvim";
 
@@ -61,7 +62,7 @@
 
       # Hardware & Security (better macOS integration via brew)
       # "pcsc-lite" # disabled — collides with macOS's built-in PCSC (CryptoTokenKit)
-                    # and can cause YubiKey "card error" issues. macOS PCSC is sufficient.
+      # and can cause YubiKey "card error" issues. macOS PCSC is sufficient.
       "ykman" # YubiKey Manager CLI
       "ykpers" # YubiKey personalization tool
 
