@@ -152,7 +152,6 @@
     # awscli2
     jaq
     hyfetch
-    neofetch
     tealdeer
     gnused
     uutils-coreutils
@@ -401,7 +400,7 @@ in {
           name = "jupyter";
           publisher = "ms-toolsai";
           version = "2025.10.2026051401";
-          sha256 = "sha256-tOI/t9BVe1UOPsrlHAi94gKvWjBF4PxeWHNQ1foePCI=";
+          sha256 = "sha256-bVdHaezdeu+SqjbfHK/6LddRuMkWK9FmSUZz6K8ktXE=";
         }
         {
           name = "jupyter-keymap";

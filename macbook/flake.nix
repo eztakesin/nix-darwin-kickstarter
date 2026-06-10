@@ -8,8 +8,8 @@
     inputs = {
         nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
-        darwin = {
-            url = "github:lnl7/nix-darwin";
+        nix-darwin = {
+            url = "github:nix-darwin/nix-darwin";
             inputs.nixpkgs.follows = "nixpkgs";
         };
 
@@ -39,7 +39,7 @@
     outputs = inputs @ {
         self,
         nixpkgs,
-        darwin,
+        nix-darwin,
         home-manager,
         darwin-emacs,
         darwin-emacs-packages,
@@ -125,7 +125,7 @@
         };
 
     in {
-        darwinConfigurations.${hostname} = darwin.lib.darwinSystem {
+        darwinConfigurations.${hostname} = nix-darwin.lib.darwinSystem {
             inherit system specialArgs;
 
             modules = [

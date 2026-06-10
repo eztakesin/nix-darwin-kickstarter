@@ -5,7 +5,7 @@
   #  macOS's System configuration
   #
   #  All the configuration options are documented here:
-  #    https://daiderd.com/nix-darwin/manual/index.html#sec-options
+  #    https://nix-darwin.github.io/nix-darwin/manual/index.html#sec-options
   #  Incomplete list of macOS `defaults` commands :
   #    https://github.com/yannbertrand/macos-defaults
   #
@@ -22,7 +22,7 @@
 
     defaults = {
       menuExtraClock.Show24Hour = true;  # show 24 hour clock
-      
+
       # customize dock
       dock = {
         autohide = true;
@@ -68,7 +68,7 @@
         # This is very useful for vim users, they use `hjkl` to move cursor.
         # sets how long it takes before it starts repeating.
         InitialKeyRepeat = 15;  # normal minimum is 15 (225 ms), maximum is 120 (1800 ms)
-        # sets how fast it repeats once it starts. 
+        # sets how fast it repeats once it starts.
         KeyRepeat = 3;  # normal minimum is 2 (30 ms), maximum is 120 (1800 ms)
 
         NSAutomaticCapitalizationEnabled = false;  # disable auto capitalization(自动大写)
@@ -83,7 +83,7 @@
       # Customize settings that not supported by nix-darwin directly
       # see the source code of this project to get more undocumented options:
       #    https://github.com/rgcr/m-cli
-      # 
+      #
       # All custom entries can be found by running `defaults read` command.
       # or `defaults read xxx` to read a specific domain.
       CustomUserPreferences = {
@@ -151,11 +151,11 @@
       # remapCapsLockToControl = false;  # remap caps lock to control, useful for emac users
       # remapCapsLockToEscape  = true;   # remap caps lock to escape, useful for vim users
 
-      # swap left command and left alt 
+      # swap left command and left alt
       # so it matches common keyboard layout: `ctrl | command | alt`
       #
       # disabled, caused only problems!
-      swapLeftCommandAndLeftAlt = false;  
+      swapLeftCommandAndLeftAlt = false;
     };
   };
 
@@ -179,7 +179,23 @@
       nerd-fonts.fira-code
       nerd-fonts.jetbrains-mono
       nerd-fonts.iosevka
+      nerd-fonts.dejavu-sans-mono # was cask: font-dejavu-sans-mono-nerd-font
       wqy_microhei
+
+      # CJK & general fonts (migrated from Homebrew casks)
+      dejavu_fonts # was cask: font-dejavu
+      # noto-fonts-cjk-sans is a single unified family covering SC/TC/JP/KR,
+      # replacing all of font-noto-sans-cjk{,-hk,-jp,-sc,-tc}
+      noto-fonts-cjk-sans
+      # replaces all of font-noto-serif-cjk{,-hk,-jp,-sc,-tc}
+      noto-fonts-cjk-serif
+      # Source Han == Noto CJK at the glyph level, but ships under a different
+      # family name ("Source Han Sans" vs "Noto Sans CJK"). Kept so apps/docs
+      # that reference the Source Han family name still resolve.
+      source-han-sans # was cask: font-source-han-sans-vf
+      source-han-serif # was cask: font-source-han-serif-vf
+      source-han-mono # covers the CJK monospace casks: font-noto-sans-mono-cjk-*
+      source-sans # was cask: font-source-sans-3 (Source Sans 3, formerly Source Sans Pro)
     ];
   };
 }
