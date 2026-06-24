@@ -161,6 +161,7 @@
     clipboard-jh
     ascii-image-converter
     zoxide # 智能 cd（记住常用路径，z foo 直接跳）
+    yt-dlp
   ];
 in {
   home.packages = with pkgs;

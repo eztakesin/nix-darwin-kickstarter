@@ -74,23 +74,23 @@
     # get migrated to Nix where an aarch64-darwin package exists.
     brews = [
       # Installs fine even now — architecture-independent (":all") bottle:
-      # "bash-completion@2" # Programmable completion for Bash 4+
+      "bash-completion@2" # Programmable completion for Bash 4+
 
       # Container stack: also broken on macOS 27, and also exists in nixpkgs for
       # darwin — but migrating means setting up the Lima VM under Nix too, so it's
       # left here for now (ask to migrate the whole stack together).
-      # "docker" # Container engine
+      "docker" # Container engine
       # "docker-compose" # Multi-container orchestration
-      # "colima" # Lightweight container runtime (Docker Desktop alternative)
+      "colima" # Lightweight container runtime (Docker Desktop alternative)
 
       # No clean Nix path on aarch64-darwin → wait for Homebrew macOS 27 support:
-      # "julia" # NOTE: do NOT --build-from-source (compiles LLVM — hours, many GB)
-      # "qbittorrent-cli" # not packaged in nixpkgs for aarch64-darwin
-      # "python" # kept for brew compatibility (use Nix `python3` if you prefer)
+      "julia" # NOTE: do NOT --build-from-source (compiles LLVM — hours, many GB)
+      "qbittorrent-cli" # not packaged in nixpkgs for aarch64-darwin
+      "python" # kept for brew compatibility (use Nix `python3` if you prefer)
       # Dropped (were broken on macOS 27 with no good darwin path):
       #   usbutils     — Linux-only (lsusb/sysfs); on macOS use `system_profiler SPUSBDataType` or `ioreg -p IOUSB`
       #   vulkan-tools — removed
-      # "github-markdown-toc" # Generate table of contents for Markdown files
+      "github-markdown-toc" # Generate table of contents for Markdown files
 
       # Migrated to Nix (see environment.systemPackages above):
       #   mas, ideviceinstaller, ykman→yubikey-manager, ykpers→yubikey-personalization,

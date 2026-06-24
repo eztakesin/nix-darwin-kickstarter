@@ -100,6 +100,28 @@
                         (old.patches or []);
                 });
             })
+            # hyfetch: the bundled neowofetch (a neofetch fork) prints its output
+            # fine but exits non-zero on macOS (the old neofetch script's final
+            # exit status is that of its last probe). hyfetch 2.1.0's Rust frontend
+            # treats that non-zero child exit as failure and prints
+            # "Error: failed to run neofetch". Force a clean exit on the script.
+            (final: prev: {
+                hyfetch = prev.hyfetch.overrideAttrs (old: {
+                    postFixup = (old.postFixup or "") + ''
+                        if [ -f "$out/bin/.neowofetch-wrapped" ]; then
+                            printf '\nexit 0\n' >> "$out/bin/.neowofetch-wrapped"
+                        fi
+                    '';
+                });
+            })
+            # nodejs: the build's checkPhase runs the full `test-ci-js` suite;
+            # test-net-autoselectfamily and test-dgram-send-cb-quelches-error need
+            # networking that the build sandbox lacks, so they fail. The actual
+            # compile + tests live in nodejs-slim_26 (nodejs_26 just symlinks its
+            # outputs), so disable the check there.
+            (final: prev: {
+                nodejs-slim_26 = prev.nodejs-slim_26.overrideAttrs (_: { doCheck = false; });
+            })
         ];
 
         # pkgs with overlays
