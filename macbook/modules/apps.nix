@@ -108,8 +108,8 @@
     # nixpkgs and won't build on darwin, so cask is the correct choice regardless.)
     casks = [
       # Browsers
-      "firefox"
-      "google-chrome"
+      "firefox@nightly"
+      "google-chrome@canary"
       "tor-browser"
 
       # Communication
