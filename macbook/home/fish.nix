@@ -75,9 +75,9 @@
       curl = "xh";
       http = "xh";
       https = "xhs";
-      mtr = "trip";
       ping = "gping";
       nmap = "rustscan";
+      mtr = "trip";
       iftop = "sudo bandwhich";
       tar = "ouch";
       untar = "ouch decompress";

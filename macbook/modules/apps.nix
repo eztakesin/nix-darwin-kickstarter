@@ -16,10 +16,8 @@
   # Nix-managed system packages (available to all users, reproducible, rollbackable)
   environment.systemPackages = with pkgs; [
     fish
-    kitty
-    starship
-    neovim
     git
+    neovim
     alejandra
     # gnupg              # moved to home-manager (home/gpg.nix → programs.gpg.enable)
     # pinentry_mac       # owned by home/gpg.nix via home.packages
@@ -34,7 +32,7 @@
     gnupatch # was brew: gpatch — provides `patch` (GNU), NOT a `gpatch` binary
     gitRepo # was brew: repo (Google's multi-repo tool)
     lsof # was brew: lsof
-    python3Packages.chardet # was brew: chardet — provides the `chardetect` CLI
+    python3Packages.chardet # was brew: chardet — provides ta` CLI
     phpPackages.composer # was brew: composer (pulls in PHP as a runtime dep)
     mas # was brew: mas (Mac App Store CLI; darwin-only package)
     ideviceinstaller # was brew: ideviceinstaller (install apps on iOS devices)
@@ -75,21 +73,13 @@
     brews = [
       # Installs fine even now — architecture-independent (":all") bottle:
       "bash-completion@2" # Programmable completion for Bash 4+
-
-      # Container stack: also broken on macOS 27, and also exists in nixpkgs for
-      # darwin — but migrating means setting up the Lima VM under Nix too, so it's
-      # left here for now (ask to migrate the whole stack together).
       "docker" # Container engine
       # "docker-compose" # Multi-container orchestration
       "colima" # Lightweight container runtime (Docker Desktop alternative)
 
-      # No clean Nix path on aarch64-darwin → wait for Homebrew macOS 27 support:
-      "julia" # NOTE: do NOT --build-from-source (compiles LLVM — hours, many GB)
+      "julia"
       "qbittorrent-cli" # not packaged in nixpkgs for aarch64-darwin
       "python" # kept for brew compatibility (use Nix `python3` if you prefer)
-      # Dropped (were broken on macOS 27 with no good darwin path):
-      #   usbutils     — Linux-only (lsusb/sysfs); on macOS use `system_profiler SPUSBDataType` or `ioreg -p IOUSB`
-      #   vulkan-tools — removed
       "github-markdown-toc" # Generate table of contents for Markdown files
 
       # Migrated to Nix (see environment.systemPackages above):
@@ -113,7 +103,7 @@
       "tor-browser"
 
       # Communication
-      "discord"
+      "discord@canary"
       "microsoft-teams"
       "zoom"
       "thunderbird"
@@ -127,24 +117,20 @@
 
       # Media
       "iina"
-      "iina+"
       "vlc"
-      "nuclear"
       "obs"
       "gstreamer-runtime"
 
       # Download
-      "aria2d"
       "c0re100-qbittorrent"
       "motrix"
 
       # Productivity & Utilities
-      "antigravity"
+      # "antigravity"
       # "antigravity-tools"
       "inkscape"
       # kitty is managed by nix (environment.systemPackages)
       # "lyx"
-      "xournal++"
       # openvisualtraceroute: replaced by trippy (nix)
       "protonvpn"
       # "sikarugir"
@@ -154,11 +140,17 @@
       # NOTE: Most fonts moved to Nix — see system.nix `fonts.packages`.
       # The following stay on Homebrew: no confirmed standalone nixpkgs package.
       # (font-material-symbols is Google's Material Symbols, distinct from the
-      #  pictogrammers material-design-icons already in fonts.packages.)
+      # material-design-icons already in fonts.packages.)
       "font-awesome-terminal-fonts"
       "font-material-symbols"
       "font-klee-one"
       "font-yusei-magic"
+      "font-material-design-icons-webfont"
+      "font-noto-sans-mono"
+      "font-source-han-sans-vf"
+      "font-source-han-serif-vf"
+      "font-source-sans-3"
+      "font-source-han-code-jp"
     ];
   };
 }

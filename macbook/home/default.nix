@@ -1,6 +1,9 @@
-{ username, config, lib, ... }:
-
 {
+  username,
+  config,
+  lib,
+  ...
+}: {
   # import sub modules
   imports = [
     ./core.nix
@@ -38,12 +41,6 @@
         source = ../dotfiles/aria2/trackers-list-aria2.sh;
         executable = true;
       };
-
-      # hyfetch config
-      ".config/hyfetch.json" = {
-        source = ../dotfiles/hyfetch.json;
-      };
-
       # Firefox user-overrides.js (for arkenfox)
       # NOTE: After first Firefox launch, you need to:
       # 1. Find your profile dir: about:profiles
@@ -58,8 +55,6 @@
       "Pictures/wallpaper.png" = {
         source = ../dotfiles/wallpapers/wallpaper.png;
       };
-
-
     };
 
     # Add to home managers dag to make sure the activation fails if emacs can't

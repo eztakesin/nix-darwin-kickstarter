@@ -28,39 +28,45 @@
       pyqt6-sip
     ]);
   lspPackages = with pkgs; [
-    rust-analyzer
-    nil # rnix-lsp
-    pyright
+    # C/c++ language server powered by clang
+    ccls
     kotlin-language-server
+    # Language server that offers Lua language support
+    lua-language-server
+    # Opinionated Lua code formatter
+    stylua
+    # Yet another language server for Nix
+    nil
+    # Type checker for the Python language
+    pyright
+    # Language server for the Rust language
+    rust-analyzer
     # nodePackages.bash-language-server
     # nodePackages.dockerfile-language-server-nodejs
     # nodePackages.eslint
     # nodePackages.graphql-language-service-cli
     # nodePackages.typescript-language-server
     # nodePackages.yaml-language-server
-    ccls
-    lua-language-server
-    stylua
     yamlfmt
     topiary
     fish-lsp
     vscode-langservers-extracted
   ];
 
-  # CLI tools migrated from Homebrew to Nix
   cliPackages = with pkgs; [
-    # Networking
-    aria2
-    wget
-    rclone
-    mtr
-    nmap
+    # Ping, but with a graph
+    gping
+    # Faster Nmap Scanning with Rust
+    rustscan
+    # mtr 替代（Rust，网络诊断 TUI）
+    trippy
 
-    # Neovim / Lazyman dependencies
-    ripgrep # rg - required by telescope.nvim
-    fd # fd - required by telescope.nvim
-    nodejs_latest # required by many LSPs and neovim plugins
-    tree-sitter # treesitter CLI for parser compilation
+    rclone
+    wget
+    # Event-driven I/O framework for the V8 JavaScript engine
+    nodejs_26
+    # Parser generator tool and an incremental parsing library
+    tree-sitter
 
     # Shell & Terminal
     bat
@@ -70,7 +76,6 @@
     bat-extras.batpipe
     bat-extras.batwatch
     bat-extras.prettybat
-    btop
     lsd
     tree
     zellij # tmux 替代（Rust，支持浮动窗格/插件）
@@ -143,25 +148,17 @@
 
     # Networking (Rust)
     xh # curl 替代（Rust，彩色输出、JSON 友好）
-    trippy # mtr 替代（Rust，网络诊断 TUI）
-    gping # ping 替代（Rust，实时图表）
     rustscan # nmap 辅助（Rust，快速端口扫描）
     bandwhich # iftop 替代（Rust，按进程显示网络流量）
 
     # Misc
-    # awscli2
-    jaq
-    hyfetch
-    tealdeer
     gnused
+    jaq
     uutils-coreutils
     uutils-diffutils
     uutils-findutils
-    ripgrep-all
     clipboard-jh
     ascii-image-converter
-    zoxide # 智能 cd（记住常用路径，z foo 直接跳）
-    yt-dlp
   ];
 in {
   home.packages = with pkgs;

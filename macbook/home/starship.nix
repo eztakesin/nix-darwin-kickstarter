@@ -1,5 +1,9 @@
-{ ... }: {
+{...}: {
   programs.starship = {
+    enable = true;
+    enableBashIntegration = true;
+    enableFishIntegration = true;
+    enableZshIntegration = true;
     settings = {
       add_newline = false;
       scan_timeout = 10;
