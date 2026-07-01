@@ -155,12 +155,23 @@
         broken_path_overlay = {foreground = "#585B70";};
       };
     };
-    # Simple, fast and user-friendly alternative to find
+    # TODO: Simple, fast and user-friendly alternative to find
     fd = {
       enable = true;
       hidden = true;
     };
-    # Neofetch with LGBTQ+ pride flags
+    # TODO: Ranger-like terminal file manager written in Rust
+    joshuto = {
+      enable = true;
+    };
+    # TODO:
+    jq = {
+      enable = true;
+    };
+    htop = {
+      enable = true;
+    };
+    # TODO: Neofetch with LGBTQ+ pride flags
     hyfetch = {
       enable = true;
       settings = {
@@ -173,7 +184,11 @@
         backend = "neofetch";
       };
     };
-    # Utility that combines the usability of The Silver Searcher with the raw speed of grep
+    # TODO: File manager with minimalistic curses interface
+    ranger = {
+      enable = true;
+    };
+    # TODO: Utility that combines the usability of The Silver Searcher with the raw speed of grep
     ripgrep = {
       enable = true;
     };

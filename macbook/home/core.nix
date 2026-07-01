@@ -57,12 +57,13 @@
     # Ping, but with a graph
     gping
     # Faster Nmap Scanning with Rust
-    rustscan
-    # mtr 替代（Rust，网络诊断 TUI）
-    trippy
-
     rclone
+    rustscan
     wget
+    # Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
+    claude-code
+    # Eclipse Temurin, prebuilt OpenJDK binary
+    temurin-bin-26
     # Event-driven I/O framework for the V8 JavaScript engine
     nodejs_26
     # Parser generator tool and an incremental parsing library
@@ -77,18 +78,14 @@
     bat-extras.batwatch
     bat-extras.prettybat
     lsd
-    tree
     zellij # tmux 替代（Rust，支持浮动窗格/插件）
     less
     fzf
-    procs
-    pv
     figlet
     lolcat
     glow
     trash-cli
     rich-cli
-    pwgen
     tailspin
     neovim-remote
 
@@ -115,22 +112,11 @@
     unar
     unzip
     pngcrush
-    rsync
-    file
     poppler-utils
     djvulibre
     librsvg
     imagemagick
     pandoc
-
-    # System Utilities
-    dust # du 替代（Rust，磁盘占用可视化）
-    smartmontools
-    moreutils
-
-    # File Managers
-    ranger
-    joshuto
 
     # Text Browsers
     lynx
@@ -145,11 +131,6 @@
 
     # AI
     gemini-cli
-
-    # Networking (Rust)
-    xh # curl 替代（Rust，彩色输出、JSON 友好）
-    rustscan # nmap 辅助（Rust，快速端口扫描）
-    bandwhich # iftop 替代（Rust，按进程显示网络流量）
 
     # Misc
     gnused
@@ -167,7 +148,16 @@ in {
       # coursera-dl
       nix-prefetch
       deno
-      # lunarvim
+      # Modern media player for macOS
+      iina
+      # Vector graphics editor
+      inkscape-with-extensions
+      # Full-featured download manager, rebuilt from scratch with Tauri 2, Vue 3, and Rust
+      motrix-next
+      # TODO: Full-featured e-mail client
+      thunderbird
+      # zoom.us video conferencing application
+      zoom-us
     ]
     ++ lspPackages
     ++ cliPackages;

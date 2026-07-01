@@ -16,7 +16,7 @@ Sharing configurations becomes seamless, and managing multiple macOS hosts is a 
 
 ## Usage
 
-```
+```sh
 nix build .#darwinConfigurations.macbook.system
 sudo ./result/sw/bin/darwin-rebuild switch --flake .#macbook
 ```

@@ -50,7 +50,7 @@
     system = "aarch64-darwin";
     hostname = "macbook";
     username = "macbook";
-    useremail = "amatoki@shiohara.me";
+    useremail = "qwquq@proton.me";
 
     # Lib
     lib = nixpkgs.lib;

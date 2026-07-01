@@ -7,7 +7,7 @@
   #
   #  Install all apps and packages here.
   #
-  #  CLI tools are primarily managed by Nix (see home/core.nix).
+  #  CLI tools are primarily managed by Nix.
   #  Homebrew is used for: macOS-specific GUI apps (casks), the container
   #  runtime, and a few formulae not (yet) usable via Nix on aarch64-darwin.
   #
@@ -16,10 +16,10 @@
   # Nix-managed system packages (available to all users, reproducible, rollbackable)
   environment.systemPackages = with pkgs; [
     fish
-    git
+    kitty
     neovim
+    starship
     alejandra
-    # gnupg              # moved to home-manager (home/gpg.nix → programs.gpg.enable)
     # pinentry_mac       # owned by home/gpg.nix via home.packages
     # just # use Justfile to simplify nix-darwin's commands
     # emacs-overlays
@@ -31,18 +31,79 @@
     # that `brew update-reset` / `--build-from-source` do not fix).
     gnupatch # was brew: gpatch — provides `patch` (GNU), NOT a `gpatch` binary
     gitRepo # was brew: repo (Google's multi-repo tool)
-    lsof # was brew: lsof
     python3Packages.chardet # was brew: chardet — provides ta` CLI
     phpPackages.composer # was brew: composer (pulls in PHP as a runtime dep)
     mas # was brew: mas (Mac App Store CLI; darwin-only package)
     ideviceinstaller # was brew: ideviceinstaller (install apps on iOS devices)
-    iftop # was brew: iftop — run as `sudo iftop` (needs pcap; Nix can't setuid the store)
     tcpdump # was brew: tcpdump — run as `sudo tcpdump`
     yubikey-manager # was brew: ykman — provides `ykman`.
     # ^ If you hit a YubiKey "card error" after rebuild, the Nix build's PCSC
     #   linkage may differ from brew's — just move `ykman` back to brews if so.
     yubikey-personalization # was brew: ykpers — provides `ykpersonalize`
-    aria2 # the aria2c CLI downloader (NOT a replacement for the aria2d GUI cask)
+
+    # Modern replacement for ps written in Rust
+    procs
+    # du, but more intuitive
+    dust
+    # Tools for monitoring the health of hard drives
+    smartmontools
+    # Collection of programs for inspecting and manipulating configuration of PCI devices
+    pciutils
+    # Tools for working with USB devices, such as lsusb
+    usbutils
+
+    # Growing collection of the unix tools that nobody thought to write long ago when unix was young
+    moreutils
+    # curl 替代, Friendly and fast tool for sending HTTP requests
+    xh
+    # Distributed version control system
+    git
+    # Tool for monitoring the progress of data through a pipeline
+    pv
+    # Command to produce a depth indented directory listing
+    tree
+    # Simple, fast and user-friendly alternative to find
+    fd
+    # Utility that combines the usability of The Silver Searcher with the raw speed of grep
+    ripgrep
+    # Tool to list open files
+    lsof
+    # Lightweight and flexible command-line JSON processor
+    jq
+    # GNU software calculator
+    bc
+    # Program that shows the type of files
+    file
+    # Fast incremental file transfer utility
+    rsync
+    # Domain name server
+    dnsutils
+    # Modern release of the GNU Privacy Guard, a GPL OpenPGP implementation
+    gnupg
+    # Modern encryption tool with small explicit keys
+    age
+    # Password generator which creates passwords which can be easily memorized by a human
+    pwgen
+    # Simple and flexible tool for managing secrets
+    sops
+    # Convert ssh private keys in ed25519 format to age keys
+    ssh-to-age
+
+    # Multi-format archive and compression library
+    libarchive
+    # Zstandard real-time compression algorithm
+    zstd
+    # Tool for creating and unpacking squashfs filesystems
+    squashfsTools
+
+    # iftop 替代, CLI utility for displaying current network utilization
+    bandwhich
+    # mtr 替代, Network diagnostics tool
+    trippy
+    # Powerful network protocol analyzer
+    wireshark-cli
+    wireshark
+    tshark
   ];
   environment.variables.EDITOR = "nvim";
 
@@ -64,12 +125,6 @@
       # FBReader = 1067172178;
     };
 
-    # `brew install`
-    # NOTE (macOS 27 pre-release): Homebrew has no bottles for this OS yet, so the
-    # formulae below still fail with ":dunno". `brew update-reset` did not help
-    # (macOS 27 support not shipped yet) and ":dunno" can't be worked around with
-    # --build-from-source. They stay here until Homebrew adds macOS 27 support, OR
-    # get migrated to Nix where an aarch64-darwin package exists.
     brews = [
       # Installs fine even now — architecture-independent (":all") bottle:
       "bash-completion@2" # Programmable completion for Bash 4+
@@ -84,7 +139,7 @@
 
       # Migrated to Nix (see environment.systemPackages above):
       #   mas, ideviceinstaller, ykman→yubikey-manager, ykpers→yubikey-personalization,
-      #   iftop, tcpdump, and earlier: gpatch, repo, lsof, chardet, composer.
+      #   tcpdump, and earlier: gpatch, repo, chardet, composer.
       # pidof: replaced by procs (nix) — use `procs --filter name=xxx`
       # X11-only (no-op on macOS without XQuartz):
       # "xclip"
@@ -105,33 +160,20 @@
       # Communication
       "discord@canary"
       "microsoft-teams"
-      "zoom"
-      "thunderbird"
 
       # Development
-      "claude-code"
       # "dbeaver-community"
       # "sqlcl"
-      "temurin"
       # VS Code is managed by home-manager (see home/core.nix)
 
       # Media
-      "iina"
-      "vlc"
       "obs"
+      "vlc"
       "gstreamer-runtime"
 
       # Download
       "c0re100-qbittorrent"
-      "motrix"
 
-      # Productivity & Utilities
-      # "antigravity"
-      # "antigravity-tools"
-      "inkscape"
-      # kitty is managed by nix (environment.systemPackages)
-      # "lyx"
-      # openvisualtraceroute: replaced by trippy (nix)
       "protonvpn"
       # "sikarugir"
       # "steam"
@@ -151,6 +193,8 @@
       "font-source-han-serif-vf"
       "font-source-sans-3"
       "font-source-han-code-jp"
+      # Roman for PDF.
+      "font-liberation"
     ];
   };
 }
