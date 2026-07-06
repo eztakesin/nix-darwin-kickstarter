@@ -1,4 +1,8 @@
-{pkgs, ...}:
+{
+  pkgs,
+  my,
+  ...
+}:
 ###################################################################################
 #
 #  macOS's System configuration
@@ -12,6 +16,16 @@
 {
   # Add ability to used TouchID for sudo authentication
   security.pam.services.sudo_local.touchIdAuth = true;
+
+  # Skip building the HTML manual (`darwin-help`): nix-darwin still passes
+  # `--toc-depth` to nixos-render-docs, which current nixpkgs removed.
+  # Re-enable once https://github.com/nix-darwin/nix-darwin/pull/1819 is merged
+  # and the nix-darwin input is updated past it. Man pages are unaffected.
+  documentation.doc.enable = false;
+  # darwin-uninstaller embeds its own default-options system eval, which builds
+  # the HTML manual regardless of the setting above — disable it for the same
+  # reason. Run `nix run nix-darwin#darwin-uninstaller` instead if ever needed.
+  system.tools.darwin-uninstaller.enable = false;
 
   # Set your time zone.
   time.timeZone = "Asia/Bangkok";
@@ -113,10 +127,10 @@
         };
         "com.apple.WindowManager" = {
           EnableStandardClickToShowDesktop = 0; # Click wallpaper to reveal desktop
-          StandardHideDesktopIcons = 0; # Show items on desktop
-          HideDesktop = 0; # Do not hide items on desktop & stage manager
-          StageManagerHideWidgets = 0;
-          StandardHideWidgets = 0;
+          StandardHideDesktopIcons = 1; # Hide items on desktop
+          HideDesktop = 1; # Hide items on desktop & stage manager
+          StageManagerHideWidgets = 1;
+          StandardHideWidgets = 1;
         };
         "com.apple.screensaver" = {
           # Require password immediately after sleep or screen saver begins
@@ -170,13 +184,14 @@
 
       # nerdfonts
       # https://github.com/NixOS/nixpkgs/blob/nixos-unstable-small/pkgs/data/fonts/nerd-fonts/manifests/fonts.json
-      nerd-fonts.symbols-only
       nerd-fonts.fira-code
+      nerd-fonts.symbols-only
       nerd-fonts.jetbrains-mono
-      nerd-fonts.iosevka
-      nerd-fonts.iosevka-term
+      # nerd-fonts.iosevka / iosevka-term / SGr-IosevkaFixed removed
+      # 2026-07: unreferenced by any config, and their 216 faces pushed the
+      # font count past what MS Office can enumerate (its "unable to load
+      # all your fonts" limit).
       nerd-fonts.dejavu-sans-mono # was cask: font-dejavu-sans-mono-nerd-font
-      wqy_microhei
 
       # CJK & general fonts (migrated from Homebrew casks)
       # NOTE: bare `fira-code` and `jetbrains-mono` are covered by the
@@ -184,13 +199,42 @@
       # `jetbrains-mono` pulls in afdko, whose test suite fails on macOS 27.
       dejavu_fonts
 
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-cjk-serif
+      # noto-fonts (the global-scripts pack) removed 2026-07: unreferenced,
+      # 229 files incl. 93 variable fonts Office handles poorly; macOS
+      # system fonts cover common scripts, Noto CJK below covers CJK.
+      # NOT noto-fonts-cjk-{sans,serif}(-static): all nixpkgs variants ship
+      # CFF collections (.ttc/OTC), which MS Office cannot parse — see the
+      # comment in pkgs/noto-cjk-otf.nix. This custom package provides the
+      # same "Noto Sans/Serif CJK JP/SC" families as single OTFs instead.
+      my.pkgs.noto-cjk-otf
       noto-fonts-color-emoji
+      # Free substitutes for Windows Japanese fonts (ＭＳ (Ｐ)ゴシック /
+      # ＭＳ 明朝) in non-Office apps. Note MS Office doesn't need these:
+      # it bundles the real MS fonts privately in its DFonts folder.
+      # BIZ UD(P)Gothic is Morisawa's MS-Office-tuned Gothic substitute;
+      # IPAex covers Mincho (BIZ UD Mincho is not in nixpkgs).
+      biz-ud-gothic
+      ipaexfont
       font-awesome
       hanazono
-      (iosevka-bin.override {variant = "SGr-IosevkaFixed";})
+      # Roman for PDF.
+      liberation_ttf
+      fira-code
+      fira-code-symbols
+      # source-han-{sans,serif,mono} intentionally omitted: nixpkgs ships
+      # them as CFF super-OTCs (SourceHanSans.ttc etc.), which MS Office
+      # cannot parse (same issue as the variable Noto CJK OTCs above), and
+      # their glyphs are identical to the Noto CJK static packages — Source
+      # Han and Noto CJK are the same typefaces under different family names.
+      source-han-code-jp
+      wqy_microhei
+      wqy_zenhei
+      # Only the Mono SC family (what Firefox references) — the full
+      # sarasa-gothic ships 480 faces; see pkgs/sarasa-mono-sc.nix.
+      my.pkgs.sarasa-mono-sc
+      arphic-ukai
+      arphic-uming
+      unfonts-core
     ];
   };
 }

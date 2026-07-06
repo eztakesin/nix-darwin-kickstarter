@@ -93,8 +93,11 @@ user_pref("sidebar.revamp", false);
 
 /*** ========== Font preferences ========== */
 user_pref("font.cjk_pref_fallback_order", "ja,zh-cn,zh-hk,zh-tw");
-user_pref("font.name.sans-serif.zh-CN", "Source Han Sans SC");
-user_pref("font.name.serif.zh-CN", "Source Han Serif SC");
+// Noto Sans/Serif CJK == Source Han Sans/Serif (same typefaces, different
+// family names); the Source Han packages were dropped because MS Office
+// cannot parse their CFF-collection format.
+user_pref("font.name.sans-serif.zh-CN", "Noto Sans CJK SC");
+user_pref("font.name.serif.zh-CN", "Noto Serif CJK SC");
 user_pref("font.name.monospace.zh-CN", "Sarasa Mono SC");
 
 

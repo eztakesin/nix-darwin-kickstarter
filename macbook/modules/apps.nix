@@ -183,18 +183,12 @@
       # The following stay on Homebrew: no confirmed standalone nixpkgs package.
       # (font-material-symbols is Google's Material Symbols, distinct from the
       # material-design-icons already in fonts.packages.)
-      "font-awesome-terminal-fonts"
       "font-material-symbols"
       "font-klee-one"
       "font-yusei-magic"
       "font-material-design-icons-webfont"
       "font-noto-sans-mono"
-      "font-source-han-sans-vf"
-      "font-source-han-serif-vf"
       "font-source-sans-3"
-      "font-source-han-code-jp"
-      # Roman for PDF.
-      "font-liberation"
     ];
   };
 }
