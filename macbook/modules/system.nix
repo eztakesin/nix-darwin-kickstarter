@@ -17,16 +17,6 @@
   # Add ability to used TouchID for sudo authentication
   security.pam.services.sudo_local.touchIdAuth = true;
 
-  # Skip building the HTML manual (`darwin-help`): nix-darwin still passes
-  # `--toc-depth` to nixos-render-docs, which current nixpkgs removed.
-  # Re-enable once https://github.com/nix-darwin/nix-darwin/pull/1819 is merged
-  # and the nix-darwin input is updated past it. Man pages are unaffected.
-  documentation.doc.enable = false;
-  # darwin-uninstaller embeds its own default-options system eval, which builds
-  # the HTML manual regardless of the setting above — disable it for the same
-  # reason. Run `nix run nix-darwin#darwin-uninstaller` instead if ever needed.
-  system.tools.darwin-uninstaller.enable = false;
-
   # Set your time zone.
   time.timeZone = "Asia/Bangkok";
 

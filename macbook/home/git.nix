@@ -16,6 +16,8 @@
 
   programs.git = {
     enable = true;
+    # Syntax-highlighting pager for git
+    delta.enable = true;
     lfs.enable = true;
 
     ignores = ["*~" "*.swp" "\\#*\\#" ".\\#*" ".vim/coc-settings.json" ".vscode" ".envrc"]; # vim swap file & emacs
@@ -110,6 +112,4 @@
     #   };
     # };
   };
-
-  # programs.gh.enable = true;
 }

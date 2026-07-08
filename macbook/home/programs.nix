@@ -10,12 +10,22 @@
       defaultEditor = true;
       viAlias = true;
       vimAlias = true;
-      withNodeJs = true;
+      # false: this would pull nixpkgs' default nodejs (24) into the closure
+      # as the node provider, duplicating the nodejs_26 pinned in core.nix.
+      # No node-based nvim plugins are in use; re-enable if one appears.
+      withNodeJs = false;
       withPython3 = true;
       withRuby = true;
+      extraPackages = with pkgs; [
+        neovim-remote
+      ];
     };
     # TODO: Lightweight, multi-protocol, multi-source, command-line download utility
     aria2 = {
+      enable = true;
+    };
+    # TODO: Cat(1) clone with syntax highlighting and Git integration
+    bat = {
       enable = true;
     };
     # TODO: Monitor of resources
@@ -160,6 +170,12 @@
       enable = true;
       hidden = true;
     };
+    # fzf intentionally not enabled: skim (below) is the fuzzy finder here —
+    # it owns the Ctrl-R/Ctrl-T keybindings and fish.nix aliases fzf to sk.
+    # TODO: GitHub CLI tool
+    gh = {
+      enable = true;
+    };
     # TODO: Ranger-like terminal file manager written in Rust
     joshuto = {
       enable = true;
@@ -184,6 +200,17 @@
         backend = "neofetch";
       };
     };
+    # TODO: Simple terminal UI for git commands
+    lazygit = {
+      enable = true;
+    };
+    # TODO: More advanced file pager than 'more'
+    less = {
+      enable = true;
+    };
+    # lsd intentionally not enabled: eza (above) is the ls replacement here —
+    # fish.nix aliases ls/ll/la to eza, so lsd would be dead weight, and its
+    # default shell integration conflicts with those aliases at eval time.
     # TODO: File manager with minimalistic curses interface
     ranger = {
       enable = true;
@@ -192,10 +219,13 @@
     ripgrep = {
       enable = true;
     };
-    # Command-line fuzzy finder written in Rust
+    # Command-line fuzzy finder written in Rust — the fuzzy finder of this
+    # config; owns Ctrl-R/Ctrl-T in all shells (fzf stays uninstalled).
     skim = {
       enable = true;
       enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableZshIntegration = true;
     };
     # Very fast implementation of tldr in Rust
     tealdeer = {
@@ -1474,6 +1504,13 @@
     # Feature-rich command-line audio/video downloader
     yt-dlp = {
       enable = true;
+    };
+    # TODO: Terminal workspace with batteries included
+    zellij = {
+      enable = true;
+      enableBashIntegration = true;
+      enableFishIntegration = true;
+      enableZshIntegration = true;
     };
     # Fast cd command that learns your habits
     zoxide = {

@@ -133,7 +133,6 @@
       "colima" # Lightweight container runtime (Docker Desktop alternative)
 
       "julia"
-      "qbittorrent-cli" # not packaged in nixpkgs for aarch64-darwin
       "python" # kept for brew compatibility (use Nix `python3` if you prefer)
       "github-markdown-toc" # Generate table of contents for Markdown files
 
@@ -161,18 +160,15 @@
       "discord@canary"
       "microsoft-teams"
 
+      # Media
+      "gstreamer-runtime"
+      "obs"
+      "vlc"
+
       # Development
       # "dbeaver-community"
       # "sqlcl"
       # VS Code is managed by home-manager (see home/core.nix)
-
-      # Media
-      "obs"
-      "vlc"
-      "gstreamer-runtime"
-
-      # Download
-      "c0re100-qbittorrent"
 
       "protonvpn"
       # "sikarugir"

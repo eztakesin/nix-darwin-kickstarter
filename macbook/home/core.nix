@@ -28,118 +28,138 @@
       pyqt6-sip
     ]);
   lspPackages = with pkgs; [
+    # Language server for Bash
+    bash-language-server
     # C/c++ language server powered by clang
     ccls
+    # Language server for Dockerfiles powered by Node.js, TypeScript, and VSCode technologies
+    dockerfile-language-server
+    # LSP implementation for the fish shell language
+    fish-lsp
     kotlin-language-server
     # Language server that offers Lua language support
     lua-language-server
-    # Opinionated Lua code formatter
-    stylua
-    # Yet another language server for Nix
-    nil
     # Type checker for the Python language
     pyright
     # Language server for the Rust language
     rust-analyzer
-    # nodePackages.bash-language-server
-    # nodePackages.dockerfile-language-server-nodejs
-    # nodePackages.eslint
-    # nodePackages.graphql-language-service-cli
-    # nodePackages.typescript-language-server
-    # nodePackages.yaml-language-server
-    yamlfmt
+    # Opinionated Lua code formatter
+    stylua
+    # Yet another language server for Nix
+    nil
+    # Uniform formatter for simple languages, as part of the Tree-sitter ecosystem
     topiary
-    fish-lsp
+    # Find and fix problems in your JavaScript code
+    eslint
+    # HTML/CSS/JSON/ESLint language servers extracted from vscode
     vscode-langservers-extracted
+    # Language Server for YAML Files
+    yaml-language-server
+    # Extensible command line tool or library to format yaml files
+    yamlfmt
   ];
 
   cliPackages = with pkgs; [
+    # Fast and extensible multi-platform HTTP/1-2-3 web server with automatic HTTPS
+    caddy
     # Ping, but with a graph
     gping
-    # Faster Nmap Scanning with Rust
+    # Simple tool for making locally-trusted development certificates
+    mkcert
+    # Command line program to sync files and directories to and from major cloud storage
     rclone
+    # Faster Nmap Scanning with Rust
     rustscan
+    # Tool for retrieving files using HTTP, HTTPS, and FTP
     wget
-    # Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
-    claude-code
-    # Eclipse Temurin, prebuilt OpenJDK binary
-    temurin-bin-26
+
+    # Command Line Interface to Rich
+    rich-cli
+    # Command line interface to the freedesktop.org trashcan
+    trash-cli
+
+    # A package manager for Lua modules.
+    luarocks
     # Event-driven I/O framework for the V8 JavaScript engine
     nodejs_26
+    # Fast, disk space efficient package manager for JavaScript
+    pnpm
+    # Eclipse Temurin, prebuilt OpenJDK binary
+    temurin-bin-26
+    # Install and run Python applications in isolated environments
+    pipx
+    # Extremely fast Python package installer and resolver, written in Rust
+    uv
+
+    # Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
+    claude-code
+    # AI agent that brings the power of Gemini directly into your terminal
+    gemini-cli
     # Parser generator tool and an incremental parsing library
     tree-sitter
 
-    # Shell & Terminal
-    bat
-    bat-extras.batgrep
-    bat-extras.batman
-    bat-extras.batdiff
-    bat-extras.batpipe
-    bat-extras.batwatch
-    bat-extras.prettybat
-    lsd
-    zellij # tmux 替代（Rust，支持浮动窗格/插件）
-    less
-    fzf
-    figlet
-    lolcat
-    glow
-    trash-cli
-    rich-cli
-    tailspin
-    neovim-remote
+    # Use your ProtonMail account with your local e-mail client
+    protonmail-bridge
 
-    # Development
-    gh
-    git-lfs
-    delta # git-delta
-    lazygit
-    go
-    rustc
-    cargo
-    cargo-edit
-    cargo-outdated
-    pipx
-    uv
-    pnpm
-    luarocks
-    mkcert
-    caddy
-
-    # File & Archive
-    ouch # 统一压缩解压（Rust，自动识别格式）
-    p7zip
+    # Command line version of the 7-Zip archiver utility
+    _7zz
+    # Command-line utility for easily compressing and decompressing files and directories
+    ouch
+    # Archive unpacker program
     unar
-    unzip
-    pngcrush
-    poppler-utils
-    djvulibre
-    librsvg
-    imagemagick
-    pandoc
 
-    # Text Browsers
+    # Convert images into ASCII art on the console
+    ascii-image-converter
+    # Cut, copy, and paste anything, anywhere, all from the terminal
+    clipboard-jh
+    # Big set of CLI tools to make/modify/optimize/show/export DJVU files
+    djvulibre
+    # Program for making large letters out of ordinary text
+    figlet
+    # Render markdown on the CLI, with pizzazz
+    glow
+    # Portable command-line driven graphing utility for many platforms
+    gnuplot
+    # GNU sed, a batch stream editor
+    gnused
+    # Software suite to create, edit, compose, or convert bitmap images
+    imagemagick
+    # jq clone focused on correctness, speed and simplicity
+    jaq
+    # Small library to render SVG images to Cairo surfaces
+    librsvg
+    # Rainbow version of cat
+    lolcat
+    # Text-mode web browser
     lynx
+    # Conversion between documentation formats
+    pandoc
+    # Optimizer for PNG files
+    pngcrush
+    # PDF rendering library
+    poppler-utils
+    # Log file highlighter
+    tailspin
+    # Text-mode web browser with tables/frames support
     w3m
 
-    # Media
-    mpv
-    gnuplot
+    # Go programming language
+    go
+    # Rust compiler
+    rustc
+    # Rust package manager
+    cargo
+    # Managing cargo dependencies from the command line
+    cargo-edit
+    # Cargo subcommand for displaying outdated dependencies
+    cargo-outdated
 
-    # Container & Virtualization
-    qemu
-
-    # AI
-    gemini-cli
-
-    # Misc
-    gnused
-    jaq
+    # Cross-platform Rust rewrite of the GNU coreutils
     uutils-coreutils
+    # Rust implementation of GNU diffutils
     uutils-diffutils
+    # Rust implementation of GNU findutils
     uutils-findutils
-    clipboard-jh
-    ascii-image-converter
   ];
 in {
   home.packages = with pkgs;
@@ -154,8 +174,14 @@ in {
       inkscape-with-extensions
       # Full-featured download manager, rebuilt from scratch with Tauri 2, Vue 3, and Rust
       motrix-next
+      # General-purpose media player
+      mpv
+      # Unofficial enhanced version of qBittorrent, a BitTorrent client
+      qbittorrent-enhanced
       # TODO: Full-featured e-mail client
       thunderbird
+      # Xournal++ is a handwriting Notetaking software with PDF annotation support
+      xournalpp
       # zoom.us video conferencing application
       zoom-us
     ]

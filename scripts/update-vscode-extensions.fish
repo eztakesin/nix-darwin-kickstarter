@@ -1,7 +1,7 @@
 #!/usr/bin/env fish
 
 # Required tools
-for tool in curl jq unzip nix-hash
+for tool in curl jq nix-hash
     if not type -q $tool
         echo "❌ Missing required tool: $tool"
         exit 1
@@ -74,7 +74,9 @@ function get_vsixpkg
         return
     end
 
-    set ext_version (unzip -qc $zipfile extension/package.json | jq -r .version)
+    # macOS bsdtar reads zip archives; absolute path so Nix's GNU tar
+    # (which can't read zip) doesn't shadow it
+    set ext_version (/usr/bin/tar -xOf $zipfile extension/package.json | jq -r .version)
     set ext_hash (nix-hash --flat --sri --type sha256 $zipfile)
 
     rm -rf $tmpdir
@@ -90,15 +92,28 @@ end
 # Begin Nix output
 echo "{ extensions = ["
 
+# Fetch all extensions in parallel: each job writes its block to a numbered
+# file (so concurrent output never interleaves), then emit in original order.
+set outdir (mktemp -d -t vscode_exts_XXXXXXXX)
+set outfiles
+set i 0
 for ext in ($code_cmd --list-extensions)
     if is_excluded $ext
         echo "⚠️  Skipping excluded extension: $ext" >&2
         continue
     end
 
-    set publisher (echo $ext | cut -d. -f1)
-    set name (echo $ext | cut -d. -f2-)
-    get_vsixpkg $publisher $name
+    set parts (string split -m1 . -- $ext)
+    set i (math $i + 1)
+    set outfile (printf "%s/%03d" $outdir $i)
+    set -a outfiles $outfile
+    get_vsixpkg $parts[1] $parts[2] >$outfile &
 end
+wait
+
+if test (count $outfiles) -gt 0
+    cat $outfiles
+end
+rm -rf $outdir
 
 echo "]; }"
