@@ -7,6 +7,10 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Fallback for packages whose unstable rebuild isn't on Hydra's
+    # aarch64-darwin cache yet (or fails to build locally on the macOS
+    # pre-release) — see the overlays list.
+    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
 
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
@@ -81,14 +85,23 @@
       # `python3.pkgs.toPythonApplication python3.pkgs.pipx`, so the
       # checkPhase runs inside `python3.pkgs.pipx`, not the top-level
       # wrapper. Overriding `pkgs.pipx` only patches the wrapper.
-      (final: prev: {
-        python3 = prev.python3.override (old: {
-          packageOverrides = pself: psuper: {
-            pipx = psuper.pipx.overridePythonAttrs (_: {
-              doCheck = false;
-            });
-          };
-        });
+      (final: prev: let
+        packageOverrides = pself: psuper: {
+          pipx = psuper.pipx.overridePythonAttrs (_: {
+            doCheck = false;
+          });
+          # pylsp-mypy: upstream tests assert on mypy's error text; newer
+          # mypy prepends a "Python 3.9 is not supported" notice, breaking
+          # the regex match. Skip tests.
+          pylsp-mypy = psuper.pylsp-mypy.overridePythonAttrs (_: {
+            doCheck = false;
+          });
+        };
+      in {
+        python3 = prev.python3.override (old: {inherit packageOverrides;});
+        # python314 is a separate attr from python3 — home/core.nix builds
+        # myPython from it, so it needs the same overrides.
+        python314 = prev.python314.override (old: {inherit packageOverrides;});
       })
       # highlight: nixpkgs carries shellscript-crash-fix.patch but upstream
       # already merged it into 4.20, so the patch fails with "Reversed (or
@@ -108,6 +121,28 @@
       # outputs), so disable the check there.
       (final: prev: {
         nodejs-slim_26 = prev.nodejs-slim_26.overrideAttrs (_: {doCheck = false;});
+      })
+      # Packages whose unstable (clang-21/apple-sdk-14.4 stdenv) rebuild
+      # isn't on Hydra's aarch64-darwin cache yet AND fail to build locally
+      # on the macOS 27 pre-release:
+      #   unar, easylpac, mpv — old cctools ld crashes at link time (Trace/BPT trap)
+      #   nodejs — configure aborts in libffi trampoline allocation
+      #   xournalpp, qbittorrent-enhanced, motrix-next — untested locally,
+      #     preemptively pinned to cached stable builds (same rebuild wave)
+      # Take the cached builds from the stable input; drop entries once
+      # unstable's are cached again.
+      (final: prev: {
+        inherit
+          (inputs.nixpkgs-stable.legacyPackages.${system})
+          unar
+          nodejs_26
+          nodejs-slim_26
+          easylpac
+          mpv-unwrapped
+          xournalpp
+          qbittorrent-enhanced
+          motrix-next
+          ;
       })
     ];
 

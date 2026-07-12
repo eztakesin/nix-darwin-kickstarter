@@ -14,10 +14,15 @@
     rm -f ~/.gitconfig
   '';
 
+  # Syntax-highlighting pager for git (moved out of programs.git.delta,
+  # which home-manager renamed to this top-level option)
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
+  };
+
   programs.git = {
     enable = true;
-    # Syntax-highlighting pager for git
-    delta.enable = true;
     lfs.enable = true;
 
     ignores = ["*~" "*.swp" "\\#*\\#" ".\\#*" ".vim/coc-settings.json" ".vscode" ".envrc"]; # vim swap file & emacs
