@@ -4,17 +4,38 @@
   lib,
   ...
 }: {
-  # import sub modules
+  # import sub modules — one file per program, kitty.nix-style
   imports = [
     ./core.nix
     ./git.nix
     ./gpg.nix
-    ./programs.nix
     ./starship.nix
     ./fish.nix
     ./kitty.nix
+
+    ./aria2.nix
     ./bat.nix
+    ./btop.nix
+    ./eza.nix
+    ./fd.nix
     ./gh.nix
+    ./htop.nix
+    ./hyfetch.nix
+    ./joshuto.nix
+    ./jq.nix
+    ./lazygit.nix
+    ./less.nix
+    ./neovim.nix
+    ./ranger.nix
+    ./ripgrep.nix
+    ./skim.nix
+    ./tealdeer.nix
+    ./yazi.nix
+    ./yt-dlp.nix
+    ./zellij.nix
+    ./zoxide.nix
+    # emacs: intentionally not enabled — see overlays/emacs.nix and the
+    # emacs-config flake input. (was: programs.emacs.package = pkgs.emacs-overlays)
   ];
 
   # Home Manager needs a bit of information about you and the
@@ -33,10 +54,10 @@
       #   recursive = true;
       # };
 
-      # aria2 config (symlinked into ~/.aria2/)
-      ".aria2/aria2.conf" = {
-        source = ../dotfiles/aria2/aria2.conf;
-      };
+      # aria2 config itself is managed by programs.aria2 (home/aria2.nix,
+      # written to ~/.config/aria2/aria2.conf). Only the tracker updater
+      # lives in ~/.aria2/ next to aria2's state files; it refreshes the
+      # bt-tracker list of the running daemon via RPC.
       ".aria2/trackers-list-aria2.sh" = {
         source = ../dotfiles/aria2/trackers-list-aria2.sh;
         executable = true;

@@ -57,17 +57,27 @@
       # Pull.
       pull.ff = "only";
 
+      # Rebase.
+      rebase.autoSquash = true;
+      rebase.abbreviateCommands = true;
+
       # Diff & merge.
-      diff.external = "${pkgs.difftastic}/bin/difft";
+      # NOT diff.external = difft: that would route ALL `git diff` output
+      # through difftastic, bypassing delta (programs.delta above owns the
+      # everyday diff/log/show/blame rendering). difftastic stays available
+      # on demand via `git dft` (alias below).
+      difftool.difftastic.cmd = "${pkgs.difftastic}/bin/difft \"$LOCAL\" \"$REMOTE\"";
       diff.tool = "nvimdiff";
       difftool.prompt = false;
       merge.tool = "nvimdiff";
-      merge.conflictstyle = "diff3";
+      merge.conflictstyle = "zdiff3";
       mergetool.prompt = false;
       rerere.enabled = true;
 
       # Pager.
-      core.pager = "less";
+      # No core.pager here: delta's enableGitIntegration already sets the
+      # per-command pagers (diff/log/show/blame) and the interactive diff
+      # filter; everything else falls back to git's default (less).
       pager.branch = "less --quit-if-one-screen";
       pager.stash = "less --quit-if-one-screen";
 
@@ -83,7 +93,9 @@
       push.autoSetupRemote = true;
       advice.detachedHead = false;
 
-      aliases = {
+      # NOTE: the section must be `alias` (singular) — git ignores an
+      # `[aliases]` section entirely.
+      alias = {
         # common aliases
         br = "branch";
         cmt = "commit -m";
@@ -93,6 +105,8 @@
         d = "diff";
         dc = "diff --cached";
         dt = "difftool";
+        # structural (AST-aware) diff via difftastic, on demand
+        dft = "difftool --tool difftastic";
         ls = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate";
         ll = "log --pretty=format:\"%C(yellow)%h%Cred%d\\\\ %Creset%s%Cblue\\\\ [%cn]\" --decorate --numstat";
         mt = "mergetool";

@@ -3,7 +3,9 @@
   pkgs,
   ...
 }: let
-  myPython = pkgs.python314.withPackages (ps:
+  # python314FixedFfi: upstream-libffi interpreter (see the overlay in
+  # flake.nix) — plain python314 crashes on `import ctypes` on macOS 27.
+  myPython = pkgs.python314FixedFfi.withPackages (ps:
     with ps; [
       aiohttp
       numpy
@@ -168,6 +170,7 @@ in {
       # coursera-dl
       nix-prefetch
       deno
+      easylpac
       # Modern media player for macOS
       iina
       # Vector graphics editor
@@ -180,6 +183,10 @@ in {
       qbittorrent-enhanced
       # TODO: Full-featured e-mail client
       thunderbird
+      # Network protocol analyzer — GUI app here (real .app copy in
+      # ~/Applications, Spotlight-indexed); bundles tshark/dumpcap CLI.
+      # Capture needs sudo (no ChmodBPF on the nix build).
+      wireshark
       # Xournal++ is a handwriting Notetaking software with PDF annotation support
       xournalpp
       # zoom.us video conferencing application

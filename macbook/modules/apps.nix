@@ -15,15 +15,17 @@
 
   # Nix-managed system packages (available to all users, reproducible, rollbackable)
   environment.systemPackages = with pkgs; [
-    fish
-    kitty
-    neovim
-    starship
+    # fish itself is installed by programs.fish.enable (system.nix) — the
+    # nix-darwin module adds it to systemPackages, which keeps the login
+    # shell path /run/current-system/sw/bin/fish valid.
+    # kitty + neovim/git/fd/ripgrep/jq/starship are managed by home-manager
+    # programs.* modules (home/) — do not also list them here. kitty.app is
+    # the real copy in ~/Applications/Home Manager Apps (pin the Dock icon
+    # from there, not /Applications/Nix Apps).
     alejandra
     # pinentry_mac       # owned by home/gpg.nix via home.packages
     # just # use Justfile to simplify nix-darwin's commands
     # emacs-overlays
-    easylpac
 
     # ── Migrated from Homebrew formulae ──────────────────────────────────────
     # Nix does NOT select bottles by macOS version, so these install fine on the
@@ -56,20 +58,12 @@
     moreutils
     # curl 替代, Friendly and fast tool for sending HTTP requests
     xh
-    # Distributed version control system
-    git
     # Tool for monitoring the progress of data through a pipeline
     pv
     # Command to produce a depth indented directory listing
     tree
-    # Simple, fast and user-friendly alternative to find
-    fd
-    # Utility that combines the usability of The Silver Searcher with the raw speed of grep
-    ripgrep
     # Tool to list open files
     lsof
-    # Lightweight and flexible command-line JSON processor
-    jq
     # GNU software calculator
     bc
     # Program that shows the type of files
@@ -100,10 +94,10 @@
     bandwhich
     # mtr 替代, Network diagnostics tool
     trippy
-    # Powerful network protocol analyzer
-    wireshark-cli
-    wireshark
-    tshark
+    # wireshark (GUI) lives in home.packages so the .app gets a real copy in
+    # ~/Applications (Spotlight-indexed); it bundles the full CLI (tshark,
+    # dumpcap, …) — wireshark-cli and tshark are the same nixpkgs package
+    # and were redundant. Capture still needs sudo (no ChmodBPF).
   ];
   environment.variables.EDITOR = "nvim";
 

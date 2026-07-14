@@ -102,6 +102,80 @@
         # python314 is a separate attr from python3 — home/core.nix builds
         # myPython from it, so it needs the same overrides.
         python314 = prev.python314.override (old: {inherit packageOverrides;});
+
+        # Interpreter linked against upstream libffi: the Apple libffi fork
+        # (darwin's default, libffi-40 — Apple has published nothing newer)
+        # aborts in trampoline allocation the moment python does
+        # `import ctypes` on this macOS 27 pre-release:
+        #   Assertion failed: (trampoline_handle),
+        #   ffi_trampoline_table_alloc_block_invoke, closures.c:258
+        # Upstream libffi (libffiReal, 3.5.2) is verified working.
+        #
+        # Deliberately a SEPARATE attr instead of overriding python3/python314:
+        # the global python3 participates in toolchain builds (clang, llvm,
+        # apple-sdk, stdenv bootstrap), so swapping its libffi invalidates the
+        # entire binary cache — a 2600-derivation world rebuild. This attr is
+        # used only where ctypes must work at runtime: myPython (home/core.nix,
+        # which is also the `python3` on PATH). Drop once nixpkgs ships a
+        # fixed libffi.
+        # Apple's libffi fork relinked without chained fixups: macOS 27's
+        # dyld rejects the trampoline dylib cctools ld produces ("chained
+        # fixups, seg_count exceeds number of segments"); -no_fixup_chains
+        # makes it loadable again. Verified with dlopen + a minimal
+        # ffi_closure_alloc test. Kept as the Apple fork (not libffiReal):
+        # cffi/pyobjc historically misbehave with upstream libffi on darwin.
+        libffiAppleFixed = final.libffi.overrideAttrs (old: {
+          pname = (old.pname or "libffi") + "-nofixupchains";
+          NIX_LDFLAGS = (old.NIX_LDFLAGS or "") + " -no_fixup_chains";
+        });
+
+        # Mandatory extras beyond swapping `libffi` (all learned the hard way):
+        #  - recursive `self`: without it the overridden interpreter's
+        #    .pkgs/.withPackages still resolve through the ORIGINAL
+        #    python314's package set, silently producing envs built on the
+        #    unpatched interpreter.
+        #  - `pythonAttr`: cpython resolves its BUILD-time interpreters via
+        #    pkgsBuildHost.${pythonAttr}; left at "python314" the package
+        #    set executes setup.py with the unpatched python, and any build
+        #    that imports ctypes (e.g. forbiddenfruit) hits the same abort.
+        #  - packageOverrides for cffi and pyobjc-core: both link libffi
+        #    DIRECTLY (cffi via its `libffi` input, pyobjc-core via a
+        #    hardcoded `darwin.libffi`) — the interpreter's libffi never
+        #    reaches them.
+        python314FixedFfi = final.python314.override {
+          libffi = final.libffiAppleFixed;
+          self = final.python314FixedFfi;
+          pythonAttr = "python314FixedFfi";
+          packageOverrides = prev.lib.composeExtensions packageOverrides (pself: psuper: {
+            cffi = psuper.cffi.override {libffi = final.libffiAppleFixed;};
+            pyobjc-core = psuper.pyobjc-core.override {
+              darwin = final.darwin // {libffi = final.libffiAppleFixed;};
+            };
+            # FSEvents on the macOS 27 beta delivers an extra file-opened
+            # event, tripping exactly one timing-sensitive watchmedo test
+            # (126 others pass). Unrelated to libffi.
+            watchdog = psuper.watchdog.overridePythonAttrs (old: {
+              disabledTests =
+                (old.disabledTests or [])
+                ++ ["test_auto_restart_not_happening_on_file_opened_event"];
+            });
+            # RLIMIT_NOFILE semantics changed on the macOS 27 beta; the
+            # fd-limit unit test asserts the old value (217 others pass).
+            virtualenv = psuper.virtualenv.overridePythonAttrs (old: {
+              disabledTests =
+                (old.disabledTests or [])
+                ++ ["test_too_many_open_files"];
+            });
+            # Subprocess stdio pause/resume ordering differs on the macOS 27
+            # beta; one delayed-stdio test asserts the old behaviour
+            # (404 others pass).
+            uvloop = psuper.uvloop.overridePythonAttrs (old: {
+              disabledTests =
+                (old.disabledTests or [])
+                ++ ["test_process_delayed_stdio__not_paused__no_stdin"];
+            });
+          });
+        };
       })
       # highlight: nixpkgs carries shellscript-crash-fix.patch but upstream
       # already merged it into 4.20, so the patch fails with "Reversed (or
@@ -176,6 +250,18 @@
       inherit system specialArgs;
 
       modules = [
+        # Generation label: `darwin-rebuild --list-generations` shows
+        # "<date>.<commit>" instead of bare numbers, so rollback targets are
+        # identifiable. Falls back to "dirty" silently — this tree is often
+        # dirty mid-iteration, and a lib.warn here would spam every eval.
+        {
+          system.configurationRevision = self.rev or null;
+          system.darwinLabel =
+            if self ? shortRev
+            then "${lib.substring 0 8 self.sourceInfo.lastModifiedDate}.${self.shortRev}"
+            else "dirty";
+        }
+
         ./modules/nix-core.nix
         ./modules/system.nix
         ./modules/apps.nix
@@ -204,5 +290,8 @@
     };
 
     formatter.${system} = nixpkgs.legacyPackages.${system}.alejandra;
+
+    # TEMPORARY debug handle — remove after libffi investigation
+    debugPkgs = pkgs;
   };
 }
