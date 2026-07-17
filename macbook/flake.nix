@@ -174,6 +174,29 @@
                 (old.disabledTests or [])
                 ++ ["test_process_delayed_stdio__not_paused__no_stdin"];
             });
+            # nodejs 24's fd handling hits EBADF on the macOS 27 beta during
+            # the `pnpm run bundle` step; node 26 builds it fine.
+            yt-dlp-ejs = psuper.yt-dlp-ejs.override {nodejs = final.nodejs_26;};
+            # pexpect-driven pty test times out on the beta (1 of 41).
+            pytest-timeout = psuper.pytest-timeout.overridePythonAttrs (old: {
+              disabledTests =
+                (old.disabledTests or [])
+                ++ ["test_disable_debugger_detection_flag"];
+            });
+            # Scheduling-timing test: writer/reader fairness assertion flakes
+            # on the beta (1 of 322).
+            filelock = psuper.filelock.overridePythonAttrs (old: {
+              disabledTests =
+                (old.disabledTests or [])
+                ++ ["test_write_non_starvation"];
+            });
+            # Clock-resolution-dependent test (same-millisecond ULID overflow
+            # never triggers with the beta's timer granularity; 1 of 69).
+            python-ulid = psuper.python-ulid.overridePythonAttrs (old: {
+              disabledTests =
+                (old.disabledTests or [])
+                ++ ["test_same_millisecond_overflow"];
+            });
           });
         };
       })
@@ -188,33 +211,54 @@
             (old.patches or []);
         });
       })
-      # nodejs: the build's checkPhase runs the full `test-ci-js` suite;
-      # test-net-autoselectfamily and test-dgram-send-cb-quelches-error need
-      # networking that the build sandbox lacks, so they fail. The actual
-      # compile + tests live in nodejs-slim_26 (nodejs_26 just symlinks its
-      # outputs), so disable the check there.
+      # neofetch (hyfetch's neowofetch) parses vm_stat with a loose
+      # `/ wired/` awk pattern; macOS 27 added a "Pages tag-storage non-tag
+      # wired:" line that also matches, so pages_wired becomes two lines,
+      # the memory arithmetic explodes, and the script dies with exit 1 —
+      # silently, because neofetch itself runs `exec 2>/dev/null`.
+      # Tighten the pattern to the exact line. Worth reporting upstream to
+      # hyfetch.
       (final: prev: {
-        nodejs-slim_26 = prev.nodejs-slim_26.overrideAttrs (_: {doCheck = false;});
+        # yt-dlp is a plain-python3 application whose import graph hits
+        # ctypes at startup → same libffi abort as everything else (this was
+        # the "python3.14 quit unexpectedly" popup when mpv/yt-dlp ran).
+        # Build it from the fixed interpreter's package set. Other python
+        # CLIs in the profile (trash/rich/pipx/chardetect) don't touch
+        # ctypes at startup and stay on the cached plain build.
+        yt-dlp = prev.yt-dlp.override {
+          python3Packages = final.python314FixedFfi.pkgs;
+        };
+        hyfetch = prev.hyfetch.overrideAttrs (old: {
+          postPatch =
+            (old.postPatch or "")
+            + ''
+              substituteInPlace neofetch \
+                --replace-fail "awk '/ wired/ { print \$4 }'" "awk '/Pages wired down/ { print \$4 }'"
+            '';
+        });
       })
+      # (removed) nodejs-slim_26 doCheck=false: that override existed for
+      # LOCAL builds (sandbox lacks networking for two tests), but it also
+      # changes the drv away from Hydra's — with the unstable cache caught
+      # up, keeping it would force a pointless (and on this machine,
+      # libffi-crashing) local nodejs build. Re-add only if nodejs must
+      # ever be built locally again.
       # Packages whose unstable (clang-21/apple-sdk-14.4 stdenv) rebuild
       # isn't on Hydra's aarch64-darwin cache yet AND fail to build locally
       # on the macOS 27 pre-release:
-      #   unar, easylpac, mpv — old cctools ld crashes at link time (Trace/BPT trap)
-      #   nodejs — configure aborts in libffi trampoline allocation
-      #   xournalpp, qbittorrent-enhanced, motrix-next — untested locally,
-      #     preemptively pinned to cached stable builds (same rebuild wave)
+      #   unar, easylpac — old cctools ld crashes at link time (Trace/BPT trap)
+      #   xournalpp, motrix-next — untested locally, preemptively pinned to
+      #     cached stable builds (same rebuild wave)
       # Take the cached builds from the stable input; drop entries once
       # unstable's are cached again.
+      # Already dropped (unstable cache caught up 2026-07-15): nodejs_26,
+      # nodejs-slim_26, mpv-unwrapped, qbittorrent-enhanced.
       (final: prev: {
         inherit
           (inputs.nixpkgs-stable.legacyPackages.${system})
           unar
-          nodejs_26
-          nodejs-slim_26
           easylpac
-          mpv-unwrapped
           xournalpp
-          qbittorrent-enhanced
           motrix-next
           ;
       })

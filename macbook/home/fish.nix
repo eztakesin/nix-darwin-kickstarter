@@ -46,9 +46,13 @@
       # ── PATH ordering (nix > brew > user tools > system) ──
       # 1. Brew (lowest priority of the three)
       eval (/opt/homebrew/bin/brew shellenv)
-      # 2. Nix paths prepended AFTER brew, so they take priority
-      fish_add_path -gP /etc/profiles/per-user/(whoami)/bin
-      fish_add_path -gP /run/current-system/sw/bin
+      # 2. Nix paths prepended AFTER brew, so they take priority.
+      # -m/--move is essential: nix-darwin's base config already put these
+      # paths in $PATH, and without --move fish_add_path SKIPS existing
+      # entries instead of moving them forward — leaving brew's python3
+      # etc. shadowing the nix ones.
+      fish_add_path -gmP /etc/profiles/per-user/(whoami)/bin
+      fish_add_path -gmP /run/current-system/sw/bin
       # 3. User tools (highest priority)
       fish_add_path -g $HOME/.cargo/bin
       fish_add_path -g $HOME/.local/bin
