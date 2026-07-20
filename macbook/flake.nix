@@ -223,11 +223,18 @@
         # ctypes at startup → same libffi abort as everything else (this was
         # the "python3.14 quit unexpectedly" popup when mpv/yt-dlp ran).
         # Build it from the fixed interpreter's package set. Other python
-        # CLIs in the profile (trash/rich/pipx/chardetect) don't touch
-        # ctypes at startup and stay on the cached plain build.
+        # CLIs in the profile (trash/rich/chardetect) don't touch ctypes
+        # at startup and stay on the cached plain build.
         yt-dlp = prev.yt-dlp.override {
           python3Packages = final.python314FixedFfi.pkgs;
         };
+        # pipx survives `pipx --version` on the plain interpreter, but
+        # `pipx list` imports ctypes (venv metadata path) → libffi abort.
+        # hyfetch 2.x's neowofetch counts packages with `pipx list --short`,
+        # so every hyfetch run popped a python3.14 crash report (the
+        # earlier fake-python3 probe missed it: the kernel launches pipx
+        # via its shebang, never resolving `python3` through PATH).
+        pipx = with final.python314FixedFfi.pkgs; toPythonApplication pipx;
         hyfetch = prev.hyfetch.overrideAttrs (old: {
           postPatch =
             (old.postPatch or "")
@@ -235,6 +242,22 @@
               substituteInPlace neofetch \
                 --replace-fail "awk '/ wired/ { print \$4 }'" "awk '/Pages wired down/ { print \$4 }'"
             '';
+        });
+      })
+      # VS Code 1.129 (darwin zip) moved node_modules back into app.asar;
+      # native binaries now sit under node_modules.asar.unpacked/, but
+      # nixpkgs' generic.nix still chmods the old node_modules/ path for
+      # every version >= 1.94, so patchPhase dies with "chmod: cannot
+      # access .../ripgrep-universal/bin/darwin-arm64/rg". Rewrite the path
+      # until nixpkgs grows a >= 1.129 branch (master is equally broken as
+      # of 2026-07-20; worth a PR). Drop when upstream fixes generic.nix.
+      (final: prev: {
+        vscode = prev.vscode.overrideAttrs (old: {
+          postPatch =
+            builtins.replaceStrings
+            ["Contents/Resources/app/node_modules/@vscode/ripgrep-universal"]
+            ["Contents/Resources/app/node_modules.asar.unpacked/@vscode/ripgrep-universal"]
+            old.postPatch;
         });
       })
       # (removed) nodejs-slim_26 doCheck=false: that override existed for
