@@ -235,6 +235,13 @@
         # earlier fake-python3 probe missed it: the kernel launches pipx
         # via its shebang, never resolving `python3` through PATH).
         pipx = with final.python314FixedFfi.pkgs; toPythonApplication pipx;
+        # ykman hits ctypes the moment it talks to the card (pyscard PC/SC
+        # bindings, fido2, cryptography/cffi) → `ykman piv info` aborts with
+        # the libffi assertion on the plain interpreter. Third victim after
+        # yt-dlp and pipx.
+        yubikey-manager = prev.yubikey-manager.override {
+          python3Packages = final.python314FixedFfi.pkgs;
+        };
         hyfetch = prev.hyfetch.overrideAttrs (old: {
           postPatch =
             (old.postPatch or "")

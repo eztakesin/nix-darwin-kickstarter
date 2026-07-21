@@ -76,6 +76,10 @@
     gnupg
     # Modern encryption tool with small explicit keys
     age
+    # age identities on YubiKey PIV slots (decrypt = card + PIN + touch);
+    # must be on PATH for sops/age to find the plugin. See
+    # manuals/sops-mnemonic.md for the full mnemonic-encryption workflow.
+    age-plugin-yubikey
     # Password generator which creates passwords which can be easily memorized by a human
     pwgen
     # Simple and flexible tool for managing secrets

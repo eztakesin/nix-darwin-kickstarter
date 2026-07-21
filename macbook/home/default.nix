@@ -29,6 +29,7 @@
     ./ranger.nix
     ./ripgrep.nix
     ./skim.nix
+    ./sops.nix
     ./tealdeer.nix
     ./yazi.nix
     ./yt-dlp.nix

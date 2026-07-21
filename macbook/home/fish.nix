@@ -100,6 +100,53 @@
         '';
         wraps = "nvim";
       };
+      # sops+Keychain secret pair — see manuals/sops-mnemonic.md.
+      # secret-save NAME: prompt (hidden) → sops-encrypt (rules from
+      # ~/secrets/.sops.yaml) → write ~/secrets/NAME.yaml AND a Keychain
+      # item "NAME-sops". secret-show NAME: Keychain → hex-decode
+      # (`security -w` hex-encodes multiline payloads) → sops decrypt
+      # (YubiKey PIN + touch; disaster path: paper key via SOPS_AGE_KEY).
+      secret-save = {
+        description = "encrypt a secret with sops and store it in Apple Keychain";
+        body = ''
+          set -l name $argv[1]
+          if test -z "$name"
+              echo "usage: secret-save NAME" >&2
+              return 1
+          end
+          read -s -P "$name> " value
+          or return 1
+          if test -z "$value"
+              echo "empty input, aborting" >&2
+              return 1
+          end
+          echo "$name: $value" | sops -e --filename-override ~/secrets/$name.yaml /dev/stdin > ~/secrets/$name.yaml
+          or begin
+              set -e value
+              return 1
+          end
+          set -e value
+          security add-generic-password -U -s $name-sops -a (whoami) -w (cat ~/secrets/$name.yaml | string collect)
+          echo "saved: ~/secrets/$name.yaml + Keychain item $name-sops"
+        '';
+      };
+      secret-show = {
+        description = "decrypt a sops secret from Apple Keychain via YubiKey";
+        body = ''
+          set -l name $argv[1]
+          if test -z "$name"
+              echo "usage: secret-show NAME" >&2
+              return 1
+          end
+          security find-generic-password -s $name-sops -w | xxd -r -p | sops -d --input-type yaml --output-type yaml --extract "[\"$name\"]" /dev/stdin
+        '';
+      };
+      mnemonic-show = {
+        description = "decrypt mnemonic from Apple Keychain via YubiKey (sops+age)";
+        body = ''
+          secret-show mnemonic
+        '';
+      };
     };
 
     # ── Plugins ──
@@ -113,5 +160,6 @@
     PAGER = "less";
     LESS = "--RAW-CONTROL-CHARS --mouse --wheel-lines=5 --LONG-PROMPT";
     LESSOPEN = "";
+    # SOPS_AGE_KEY_FILE moved to home/sops.nix
   };
 }
