@@ -14,6 +14,7 @@
     ./kitty.nix
 
     ./aria2.nix
+    ./bash.nix
     ./bat.nix
     ./btop.nix
     ./eza.nix

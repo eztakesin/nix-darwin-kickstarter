@@ -124,23 +124,12 @@
     };
 
     brews = [
-      # Installs fine even now — architecture-independent (":all") bottle:
-      "bash-completion@2" # Programmable completion for Bash 4+
       "docker" # Container engine
       # "docker-compose" # Multi-container orchestration
       "colima" # Lightweight container runtime (Docker Desktop alternative)
 
-      "julia"
       "python" # kept for brew compatibility (use Nix `python3` if you prefer)
       "github-markdown-toc" # Generate table of contents for Markdown files
-
-      # Migrated to Nix (see environment.systemPackages above):
-      #   mas, ideviceinstaller, ykman→yubikey-manager, ykpers→yubikey-personalization,
-      #   tcpdump, and earlier: gpatch, repo, chardet, composer.
-      # pidof: replaced by procs (nix) — use `procs --filter name=xxx`
-      # X11-only (no-op on macOS without XQuartz):
-      # "xclip"
-      # "xsel"
     ];
 
     # `brew install --cask`
@@ -163,10 +152,16 @@
       "obs"
       "vlc"
 
+      # Desktop publishing — nixpkgs scribus is meta.broken on
+      # aarch64-darwin (and uncached); the cask ships the official
+      # upstream binary.
+      "scribus"
+
       # Development
       # "dbeaver-community"
       # "sqlcl"
       # VS Code is managed by home-manager (see home/core.nix)
+      "claude" # Claude Desktop app
 
       "protonvpn"
       # "sikarugir"

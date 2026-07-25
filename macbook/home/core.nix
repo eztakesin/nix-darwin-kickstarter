@@ -1,11 +1,13 @@
 {
   lib,
   pkgs,
+  my,
   ...
 }: let
-  # python314FixedFfi: upstream-libffi interpreter (see the overlay in
-  # flake.nix) — plain python314 crashes on `import ctypes` on macOS 27.
-  myPython = pkgs.python314FixedFfi.withPackages (ps:
+  # Back on plain python314 since 2026-07-25: the macOS 27 libffi
+  # trampoline crash was fixed upstream (nixpkgs#541990) and the
+  # FixedFfi scaffold in flake.nix was dismantled.
+  myPython = pkgs.python314.withPackages (ps:
     with ps; [
       aiohttp
       numpy
@@ -130,10 +132,17 @@
     jaq
     # Small library to render SVG images to Cairo surfaces
     librsvg
+    # qalc — unit/currency-aware calculator CLI+REPL (live exchange
+    # rates). Usage: manuals/qalc-numbat.md
+    libqalculate
     # Rainbow version of cat
     lolcat
     # Text-mode web browser
     lynx
+    # Unit-aware calculator REPL with dimensional analysis (catches
+    # `1 m + 1 s` at parse time; ECB rates auto-fetched). Usage:
+    # manuals/qalc-numbat.md
+    numbat
     # Conversion between documentation formats
     pandoc
     # Optimizer for PNG files
@@ -170,7 +179,16 @@ in {
       # coursera-dl
       nix-prefetch
       deno
+      # Julia — julia-bin repacks the official arm64 binaries (no local
+      # compile; Pkg works normally, packages live in ~/.julia).
+      # Replaces the `julia` brew.
+      julia-bin
       easylpac
+      # .app launchers for the two GUI packages whose nixpkgs darwin
+      # builds ship no bundle (Spotlight/Launchpad visibility); official
+      # upstream icons, CLI bins still come from the packages above/below
+      my.pkgs.easylpac-app
+      my.pkgs.xournalpp-app
       # Modern media player for macOS
       iina
       # Vector graphics editor
@@ -179,6 +197,15 @@ in {
       motrix-next
       # General-purpose media player
       mpv
+      # Proton Mail official desktop app (repack of the upstream dmg).
+      # Updates ride nixpkgs bumps — the app's built-in auto-update is
+      # inert in the read-only store copy. protonmail-bridge (separate,
+      # for another mailbox via IMAP/SMTP) is unrelated to this app.
+      protonmail-desktop
+      # Qalculate GUI — same engine as qalc; ships a real .app on darwin
+      # (upstream publishes no macOS binaries; brew only has formulae,
+      # which are dead on the macOS 27 beta)
+      qalculate-qt
       # Unofficial enhanced version of qBittorrent, a BitTorrent client
       qbittorrent-enhanced
       # TODO: Full-featured e-mail client

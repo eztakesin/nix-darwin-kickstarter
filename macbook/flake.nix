@@ -7,10 +7,9 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    # Fallback for packages whose unstable rebuild isn't on Hydra's
-    # aarch64-darwin cache yet (or fails to build locally on the macOS
-    # pre-release) — see the overlays list.
-    nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-26.05";
+    # (removed 2026-07-25) nixpkgs-stable: the cache-wave fallback input.
+    # Re-add together with its pin overlay if Hydra's aarch64-darwin
+    # cache ever lags a stdenv rebuild again (see overlays list note).
 
     nix-darwin = {
       url = "github:nix-darwin/nix-darwin";
@@ -64,142 +63,43 @@
       darwin-emacs.overlays.emacs
       darwin-emacs-packages.overlays.package
       (import ./overlays/emacs.nix)
-      # deno checkPhase bug: test target named "integration_test" not "integration_tests"
-      (final: prev: {
-        deno = prev.deno.overrideAttrs (old: {doCheck = false;});
-      })
-      # jeepney: installCheckPhase requires dbus which is unavailable on macOS
-      (final: prev: {
-        python313Packages = prev.python313Packages.override {
-          overrides = pfinal: pprev: {
-            jeepney = pprev.jeepney.overrideAttrs (old: {
-              doInstallCheck = false;
-              pythonImportsCheck = [];
-            });
-          };
-        };
-      })
-      # pipx: upstream tests assert on PEP 508 spec whitespace ("nox@URL" vs
-      # "nox @ URL"); breaks with newer packaging lib. Skip checks.
-      # Must override at the python3 interpreter level: `pkgs.pipx` is
-      # `python3.pkgs.toPythonApplication python3.pkgs.pipx`, so the
-      # checkPhase runs inside `python3.pkgs.pipx`, not the top-level
-      # wrapper. Overriding `pkgs.pipx` only patches the wrapper.
+      # (removed 2026-07-25, the great teardown) deno doCheck=false and
+      # python313Packages.jeepney install-check skip: cache-miss-era
+      # relics; both packages ride Hydra's cache again.
+      #
+      # pipx + pylsp-mypy doCheck=false SURVIVED the teardown, verified
+      # 2026-07-25: their upstream test suites are genuinely broken
+      # (pipx: 18 collection errors; pylsp-mypy: asserts on mypy's error
+      # text), so HYDRA cannot build them either — there is no cached
+      # plain drv to lose. These two stay local-built until upstream
+      # fixes their tests. Must override at the interpreter level:
+      # `pkgs.pipx` is `python3.pkgs.toPythonApplication python3.pkgs
+      # .pipx`, so the checkPhase runs inside `python3.pkgs.pipx`.
       (final: prev: let
         packageOverrides = pself: psuper: {
           pipx = psuper.pipx.overridePythonAttrs (_: {
             doCheck = false;
           });
-          # pylsp-mypy: upstream tests assert on mypy's error text; newer
-          # mypy prepends a "Python 3.9 is not supported" notice, breaking
-          # the regex match. Skip tests.
           pylsp-mypy = psuper.pylsp-mypy.overridePythonAttrs (_: {
             doCheck = false;
           });
         };
       in {
         python3 = prev.python3.override (old: {inherit packageOverrides;});
-        # python314 is a separate attr from python3 — home/core.nix builds
-        # myPython from it, so it needs the same overrides.
+        # python314 is a separate attr — home/core.nix builds myPython
+        # from it, so it needs the same overrides.
         python314 = prev.python314.override (old: {inherit packageOverrides;});
-
-        # Interpreter linked against upstream libffi: the Apple libffi fork
-        # (darwin's default, libffi-40 — Apple has published nothing newer)
-        # aborts in trampoline allocation the moment python does
-        # `import ctypes` on this macOS 27 pre-release:
-        #   Assertion failed: (trampoline_handle),
-        #   ffi_trampoline_table_alloc_block_invoke, closures.c:258
-        # Upstream libffi (libffiReal, 3.5.2) is verified working.
-        #
-        # Deliberately a SEPARATE attr instead of overriding python3/python314:
-        # the global python3 participates in toolchain builds (clang, llvm,
-        # apple-sdk, stdenv bootstrap), so swapping its libffi invalidates the
-        # entire binary cache — a 2600-derivation world rebuild. This attr is
-        # used only where ctypes must work at runtime: myPython (home/core.nix,
-        # which is also the `python3` on PATH). Drop once nixpkgs ships a
-        # fixed libffi.
-        # Apple's libffi fork relinked without chained fixups: macOS 27's
-        # dyld rejects the trampoline dylib cctools ld produces ("chained
-        # fixups, seg_count exceeds number of segments"); -no_fixup_chains
-        # makes it loadable again. Verified with dlopen + a minimal
-        # ffi_closure_alloc test. Kept as the Apple fork (not libffiReal):
-        # cffi/pyobjc historically misbehave with upstream libffi on darwin.
-        libffiAppleFixed = final.libffi.overrideAttrs (old: {
-          pname = (old.pname or "libffi") + "-nofixupchains";
-          NIX_LDFLAGS = (old.NIX_LDFLAGS or "") + " -no_fixup_chains";
-        });
-
-        # Mandatory extras beyond swapping `libffi` (all learned the hard way):
-        #  - recursive `self`: without it the overridden interpreter's
-        #    .pkgs/.withPackages still resolve through the ORIGINAL
-        #    python314's package set, silently producing envs built on the
-        #    unpatched interpreter.
-        #  - `pythonAttr`: cpython resolves its BUILD-time interpreters via
-        #    pkgsBuildHost.${pythonAttr}; left at "python314" the package
-        #    set executes setup.py with the unpatched python, and any build
-        #    that imports ctypes (e.g. forbiddenfruit) hits the same abort.
-        #  - packageOverrides for cffi and pyobjc-core: both link libffi
-        #    DIRECTLY (cffi via its `libffi` input, pyobjc-core via a
-        #    hardcoded `darwin.libffi`) — the interpreter's libffi never
-        #    reaches them.
-        python314FixedFfi = final.python314.override {
-          libffi = final.libffiAppleFixed;
-          self = final.python314FixedFfi;
-          pythonAttr = "python314FixedFfi";
-          packageOverrides = prev.lib.composeExtensions packageOverrides (pself: psuper: {
-            cffi = psuper.cffi.override {libffi = final.libffiAppleFixed;};
-            pyobjc-core = psuper.pyobjc-core.override {
-              darwin = final.darwin // {libffi = final.libffiAppleFixed;};
-            };
-            # FSEvents on the macOS 27 beta delivers an extra file-opened
-            # event, tripping exactly one timing-sensitive watchmedo test
-            # (126 others pass). Unrelated to libffi.
-            watchdog = psuper.watchdog.overridePythonAttrs (old: {
-              disabledTests =
-                (old.disabledTests or [])
-                ++ ["test_auto_restart_not_happening_on_file_opened_event"];
-            });
-            # RLIMIT_NOFILE semantics changed on the macOS 27 beta; the
-            # fd-limit unit test asserts the old value (217 others pass).
-            virtualenv = psuper.virtualenv.overridePythonAttrs (old: {
-              disabledTests =
-                (old.disabledTests or [])
-                ++ ["test_too_many_open_files"];
-            });
-            # Subprocess stdio pause/resume ordering differs on the macOS 27
-            # beta; one delayed-stdio test asserts the old behaviour
-            # (404 others pass).
-            uvloop = psuper.uvloop.overridePythonAttrs (old: {
-              disabledTests =
-                (old.disabledTests or [])
-                ++ ["test_process_delayed_stdio__not_paused__no_stdin"];
-            });
-            # nodejs 24's fd handling hits EBADF on the macOS 27 beta during
-            # the `pnpm run bundle` step; node 26 builds it fine.
-            yt-dlp-ejs = psuper.yt-dlp-ejs.override {nodejs = final.nodejs_26;};
-            # pexpect-driven pty test times out on the beta (1 of 41).
-            pytest-timeout = psuper.pytest-timeout.overridePythonAttrs (old: {
-              disabledTests =
-                (old.disabledTests or [])
-                ++ ["test_disable_debugger_detection_flag"];
-            });
-            # Scheduling-timing test: writer/reader fairness assertion flakes
-            # on the beta (1 of 322).
-            filelock = psuper.filelock.overridePythonAttrs (old: {
-              disabledTests =
-                (old.disabledTests or [])
-                ++ ["test_write_non_starvation"];
-            });
-            # Clock-resolution-dependent test (same-millisecond ULID overflow
-            # never triggers with the beta's timer granularity; 1 of 69).
-            python-ulid = psuper.python-ulid.overridePythonAttrs (old: {
-              disabledTests =
-                (old.disabledTests or [])
-                ++ ["test_same_millisecond_overflow"];
-            });
-          });
-        };
       })
+      #
+      # (removed 2026-07-25) THE LIBFFI SCAFFOLD — libffiAppleFixed
+      # (-no_fixup_chains relink) + python314FixedFfi (recursive self,
+      # pythonAttr, cffi/pyobjc-core libffi rewires, six beta-flaky
+      # per-test disables) + the yt-dlp/pipx/yubikey-manager migrations.
+      # macOS 27's dyld rejected the trampoline dylib cctools ld emitted;
+      # fixed upstream by nixpkgs#541990 (credits: this flake's author),
+      # which reached nixpkgs-unstable at 6d120041. Plain python3 verified
+      # on-device: `import ctypes` clean from the binary cache.
+      # History: git log around 2ac9390..bab2d63, and issue #541367.
       # highlight: nixpkgs carries shellscript-crash-fix.patch but upstream
       # already merged it into 4.20, so the patch fails with "Reversed (or
       # previously applied) patch detected". Drop it.
@@ -218,30 +118,13 @@
       # silently, because neofetch itself runs `exec 2>/dev/null`.
       # Tighten the pattern to the exact line. Worth reporting upstream to
       # hyfetch.
+      # (The yt-dlp/pipx/yubikey-manager FixedFfi migrations that lived
+      # here left with the scaffold — plain builds ride the cache again.)
+      # The --replace-fail below doubles as a tripwire: hyfetch 2.1.0
+      # still ships the old pattern; the release containing our merged
+      # fix (hyfetch#526) will make this build FAIL LOUDLY — that's the
+      # signal to delete this overlay.
       (final: prev: {
-        # yt-dlp is a plain-python3 application whose import graph hits
-        # ctypes at startup → same libffi abort as everything else (this was
-        # the "python3.14 quit unexpectedly" popup when mpv/yt-dlp ran).
-        # Build it from the fixed interpreter's package set. Other python
-        # CLIs in the profile (trash/rich/chardetect) don't touch ctypes
-        # at startup and stay on the cached plain build.
-        yt-dlp = prev.yt-dlp.override {
-          python3Packages = final.python314FixedFfi.pkgs;
-        };
-        # pipx survives `pipx --version` on the plain interpreter, but
-        # `pipx list` imports ctypes (venv metadata path) → libffi abort.
-        # hyfetch 2.x's neowofetch counts packages with `pipx list --short`,
-        # so every hyfetch run popped a python3.14 crash report (the
-        # earlier fake-python3 probe missed it: the kernel launches pipx
-        # via its shebang, never resolving `python3` through PATH).
-        pipx = with final.python314FixedFfi.pkgs; toPythonApplication pipx;
-        # ykman hits ctypes the moment it talks to the card (pyscard PC/SC
-        # bindings, fido2, cryptography/cffi) → `ykman piv info` aborts with
-        # the libffi assertion on the plain interpreter. Third victim after
-        # yt-dlp and pipx.
-        yubikey-manager = prev.yubikey-manager.override {
-          python3Packages = final.python314FixedFfi.pkgs;
-        };
         hyfetch = prev.hyfetch.overrideAttrs (old: {
           postPatch =
             (old.postPatch or "")
@@ -251,47 +134,15 @@
             '';
         });
       })
-      # VS Code 1.129 (darwin zip) moved node_modules back into app.asar;
-      # native binaries now sit under node_modules.asar.unpacked/, but
-      # nixpkgs' generic.nix still chmods the old node_modules/ path for
-      # every version >= 1.94, so patchPhase dies with "chmod: cannot
-      # access .../ripgrep-universal/bin/darwin-arm64/rg". Rewrite the path
-      # until nixpkgs grows a >= 1.129 branch (master is equally broken as
-      # of 2026-07-20; worth a PR). Drop when upstream fixes generic.nix.
-      (final: prev: {
-        vscode = prev.vscode.overrideAttrs (old: {
-          postPatch =
-            builtins.replaceStrings
-            ["Contents/Resources/app/node_modules/@vscode/ripgrep-universal"]
-            ["Contents/Resources/app/node_modules.asar.unpacked/@vscode/ripgrep-universal"]
-            old.postPatch;
-        });
-      })
-      # (removed) nodejs-slim_26 doCheck=false: that override existed for
-      # LOCAL builds (sandbox lacks networking for two tests), but it also
-      # changes the drv away from Hydra's — with the unstable cache caught
-      # up, keeping it would force a pointless (and on this machine,
-      # libffi-crashing) local nodejs build. Re-add only if nodejs must
-      # ever be built locally again.
-      # Packages whose unstable (clang-21/apple-sdk-14.4 stdenv) rebuild
-      # isn't on Hydra's aarch64-darwin cache yet AND fail to build locally
-      # on the macOS 27 pre-release:
-      #   unar, easylpac — old cctools ld crashes at link time (Trace/BPT trap)
-      #   xournalpp, motrix-next — untested locally, preemptively pinned to
-      #     cached stable builds (same rebuild wave)
-      # Take the cached builds from the stable input; drop entries once
-      # unstable's are cached again.
-      # Already dropped (unstable cache caught up 2026-07-15): nodejs_26,
-      # nodejs-slim_26, mpv-unwrapped, qbittorrent-enhanced.
-      (final: prev: {
-        inherit
-          (inputs.nixpkgs-stable.legacyPackages.${system})
-          unar
-          easylpac
-          xournalpp
-          motrix-next
-          ;
-      })
+      # (removed 2026-07-25) vscode asar-path overlay: upstream fix was
+      # our own NixOS/nixpkgs#543899, merged 07-21, in-tree at 6d120041.
+      # (removed 2026-07-25) the nixpkgs-stable pin bridge (unar,
+      # easylpac, xournalpp, motrix-next): unstable's cache finally
+      # carries all four. Pattern for the next cache wave: add a
+      # nixos-XX.YY input + one `inherit (inputs.nixpkgs-stable
+      # .legacyPackages.${system}) <pkgs>;` overlay. NOTE: local builds
+      # still ld-crash on this beta (cctools 1010.6, Trace/BPT trap), so
+      # a future wave means re-pinning, not building through.
     ];
 
     # pkgs with overlays
@@ -301,9 +152,12 @@
     };
 
     # my.pkgs = ./pkgs/default.nix
+    # NOTE: must use the OVERLAID pkgs, not nixpkgs.legacyPackages —
+    # custom packages that wrap or depend on overlay-fixed packages
+    # (stable pins, FixedFfi python apps) would otherwise resolve to the
+    # broken/uncached plain-unstable variants.
     myPkgs = import ./pkgs {
-      inherit lib inputs;
-      pkgs = nixpkgs.legacyPackages.${system};
+      inherit lib inputs pkgs;
     };
 
     # my = ./my/default.nix + myPkgs
@@ -367,5 +221,7 @@
 
     # TEMPORARY debug handle — remove after libffi investigation
     debugPkgs = pkgs;
+    # Debug handle for custom packages: `nix build .#debugMy.pkgs.<name>`
+    debugMy = my;
   };
 }
