@@ -154,6 +154,9 @@
     # Text-mode web browser with tables/frames support
     w3m
 
+    # Portable, fast and modular toolkit for Ethereum application development (forge/cast/anvil/chisel)
+    foundry
+
     # Go programming language
     go
     # Rust compiler
@@ -228,6 +231,7 @@ in {
     profiles.default.extensions = with pkgs.vscode-extensions;
       [
         rust-lang.rust-analyzer # Advanced Rust language server
+        nomicfoundation.hardhat-solidity # Solidity language server by Nomic Foundation (Foundry-aware)
         ms-python.python # Core Python support (debugging, IntelliSense, etc.)
         njpwerner.autodocstring # Auto-generates Python docstrings
         ms-toolsai.jupyter-renderers # Rich output renderers for Jupyter

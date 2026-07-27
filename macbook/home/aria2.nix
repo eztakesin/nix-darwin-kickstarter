@@ -1,4 +1,21 @@
-{...}: {
+{
+  pkgs,
+  config,
+  ...
+}: let
+  # Launchd wrapper: pull the RPC secret from the login Keychain at start
+  # so it never touches this (public) repo or the world-readable store.
+  # One-time setup on a new machine:
+  #   security add-generic-password -s aria2-rpc -a (whoami) -w
+  # If the item is missing the daemon still starts, just without a secret
+  # (acceptable: RPC is loopback-only on a single-user machine).
+  aria2Launcher = pkgs.writeShellScript "aria2-launchd" ''
+    secret="$(/usr/bin/security find-generic-password -s aria2-rpc -w 2>/dev/null || true)"
+    exec ${pkgs.aria2}/bin/aria2c \
+      --conf-path="${config.xdg.configHome}/aria2/aria2.conf" \
+      ''${secret:+--rpc-secret="$secret"}
+  '';
+in {
   # Migrated from dotfiles/aria2/aria2.conf (Starlink + VPN + public BT, no PT).
   # home-manager writes this to ~/.config/aria2/aria2.conf (XDG path, which
   # aria2 ≥1.36 reads natively). State (session/DHT/logs) stays in ~/.aria2/
@@ -35,11 +52,9 @@
       rpc-allow-origin-all = true;
       rpc-listen-all = false;
       rpc-listen-port = 6800;
-      # NOTE: lives in the world-readable nix store. Acceptable while RPC is
-      # loopback-only (rpc-listen-all = false) on a single-user machine; if
-      # that ever changes, move the secret out (sops-nix) before exposing.
-      # Regenerate on a new machine: pwgen -s 32 1
-      rpc-secret = "CHANGE_ME_ON_NEW_MACHINE";
+      # rpc-secret deliberately NOT here (public repo + world-readable
+      # store): the launchd wrapper above injects it from the Keychain
+      # via --rpc-secret at startup.
 
       ##### HTTP/HTTPS/FTP #####
       max-concurrent-downloads = 5;
@@ -81,5 +96,31 @@
       seed-time = 0;
       seed-ratio = 0.1;
     };
+  };
+
+  # Always-on daemon. Logs: ~/Library/Logs/aria2-launchd.log (launchd
+  # stdout/stderr; aria2's own log stays in ~/.aria2/aria2.log).
+  launchd.agents.aria2 = {
+    enable = true;
+    config = {
+      ProgramArguments = ["${aria2Launcher}"];
+      RunAtLoad = true;
+      KeepAlive = true;
+      ProcessType = "Background";
+      StandardOutPath = "${config.home.homeDirectory}/Library/Logs/aria2-launchd.log";
+      StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/aria2-launchd.log";
+    };
+  };
+
+  # AriaNg — static web UI for the aria2 RPC. `aria2-ui` opens it in the
+  # default browser (Safari); it talks to localhost:6800 directly from the
+  # page (rpc-allow-origin-all covers the file:// origin). Enter the
+  # Keychain secret once in AriaNg settings (stored in browser storage).
+  home.packages = [pkgs.ariang];
+  programs.fish.functions.aria2-ui = {
+    description = "open the AriaNg web UI for the local aria2 daemon";
+    body = ''
+      open /etc/profiles/per-user/(whoami)/share/ariang/index.html
+    '';
   };
 }
