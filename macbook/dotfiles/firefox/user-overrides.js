@@ -42,6 +42,48 @@ user_pref("signon.firefoxRelay.feature", "disabled");
 user_pref("privacy.globalprivacycontrol.enabled", true);
 
 
+/*** ========== 遥测:补上 arkenfox 的缺口 ========== */
+// arkenfox 的 0300 段已经关掉了绝大部分:技术与交互数据
+// (datareporting.policy/healthreport)、整套 toolkit.telemetry.*、
+// 扩展推荐(browser.discovery)、功能实验(app.shield.optoutstudies)、
+// 远程功能推送(app.normandy)、崩溃报告(breakpad + crashReports)。
+// 下面两条是它(144 版)还没收录的较新遥测通道:
+user_pref("datareporting.usage.uploadEnabled", false); // 每日活跃用户 ping
+user_pref("browser.ping-centre.telemetry", false); // ping-centre(新标签页等)
+
+
+/*** ========== 关闭内置 VPN(IP Protection) ========== */
+// Mozilla 的内置 VPN。关掉它同时会把工具栏上那个 VPN 按钮一并移除,
+// 不需要额外的 userChrome.css 规则。
+// 本机流量本来就走 ProtonVPN,不需要浏览器再套一层(套了反而多一个
+// 需要信任的第三方,以及和现有隧道打架的可能)。
+user_pref("browser.ipProtection.enabled", false);
+
+
+/*** ========== 关闭 AI 功能 ========== */
+// arkenfox 尚未覆盖这些(功能太新)。关掉 AI 标签分组建议和侧边栏聊天机器人。
+// 注意:没有动 browser.ml.enable 这个总开关 —— 内置翻译也走本地 ML 栈,
+// 一刀切可能把刚配好的翻译一起关掉。要彻底禁用再单独评估。
+user_pref("browser.tabs.groups.smart.enabled", false); // AI 建议标签分组/命名
+user_pref("browser.ml.chat.enabled", false); // 侧边栏 AI 聊天
+
+
+/*** ========== 内置翻译 ========== */
+// Firefox 的翻译在本地运行(模型下载到本机,不上传页面内容)。
+// 总是翻译:泰语、越南语、德语、西班牙语、法语 + 北欧语系
+// (丹麦语 da、瑞典语 sv、挪威语 nb、芬兰语 fi、冰岛语 is)
+user_pref("browser.translations.alwaysTranslateLanguages", "th,vi,de,es,fr,da,sv,nb,fi,is");
+// 从不翻译:中文(简/繁)、日语、英语 —— 看得懂,不需要
+user_pref("browser.translations.neverTranslateLanguages", "zh-Hans,zh-Hant,ja,en");
+
+
+/*** ========== 动效与链接样式 ========== */
+// 始终给链接加下划线:不依赖颜色区分链接,对色觉和扫读都友好
+user_pref("layout.css.always_underline_links", true);
+// 平滑滚动(Firefox 默认已开,这里显式固定,避免以后默认值变化)
+user_pref("general.smoothScroll", true);
+
+
 /*** ========== 界面密度 ========== */
 // 0=Standard, 1=Compact, 2=Touch。设置面板里的 "Window density"。
 // 若发现不生效(新版设置界面可能换了 pref),在界面里点一次 Compact 后
