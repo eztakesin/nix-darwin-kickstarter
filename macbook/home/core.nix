@@ -4,6 +4,23 @@
   my,
   ...
 }: let
+  # Google's official Android Emulator + SDK, declaratively composed.
+  # Full Android-in-a-window (arm64-native, Metal-accelerated, Play
+  # Store image); usage: manuals/ or
+  #   avdmanager create avd -n pixel -k "system-images;android-36;google_apis_playstore;arm64-v8a"
+  #   emulator -avd pixel
+  # AVD state lives imperatively in ~/.android (like ~/.julia). Heads
+  # up: components are fetched from dl.google.com (~2-3 GiB).
+  # Requires config.android_sdk.accept_license = true (flake.nix).
+  androidSdk =
+    (pkgs.androidenv.composeAndroidPackages {
+      includeEmulator = true;
+      includeSystemImages = true;
+      platformVersions = ["36"];
+      systemImageTypes = ["google_apis_playstore"];
+      abiVersions = ["arm64-v8a"];
+    }).androidsdk;
+
   # Back on plain python314 since 2026-07-25: the macOS 27 libffi
   # trampoline crash was fixed upstream (nixpkgs#541990) and the
   # FixedFfi scaffold in flake.nix was dismantled.
@@ -45,8 +62,8 @@
     lua-language-server
     # Type checker for the Python language
     pyright
-    # Language server for the Rust language
-    rust-analyzer
+    # rust-analyzer comes as a component of the nightly toolchain
+    # (home/rust.nix) — toolchain-matched proc-macro server.
     # Opinionated Lua code formatter
     stylua
     # Yet another language server for Nix
@@ -159,14 +176,8 @@
 
     # Go programming language
     go
-    # Rust compiler
-    rustc
-    # Rust package manager
-    cargo
-    # Managing cargo dependencies from the command line
-    cargo-edit
-    # Cargo subcommand for displaying outdated dependencies
-    cargo-outdated
+    # Rust: the whole toolchain (nightly, via rust-overlay) and the
+    # cargo-* subcommands live in home/rust.nix.
 
     # Cross-platform Rust rewrite of the GNU coreutils
     uutils-coreutils
@@ -179,6 +190,7 @@ in {
   home.packages = with pkgs;
     [
       myPython # Compiler & interpreters
+      androidSdk # Android Emulator + SDK (see let-block above)
       # coursera-dl
       nix-prefetch
       deno

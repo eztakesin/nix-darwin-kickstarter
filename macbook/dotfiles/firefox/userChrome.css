@@ -1,0 +1,31 @@
+/***********************************************************
+ * userChrome.css — Firefox 界面(chrome)自定义
+ *
+ * 需要 toolkit.legacyUserProfileCustomizations.stylesheets = true
+ * (在 user-overrides.js 里设置),否则 Firefox 根本不读本文件。
+ *
+ * 由 nix 管理:改这里 → darwin-rebuild switch → 重启 Firefox
+ * 快捷键速查:manuals/firefox-keys.md
+ ***********************************************************/
+
+/*** 完全隐藏标签栏(含标题栏那一条) ***/
+/* macOS 上 #TabsToolbar 同时充当标题栏:红黄绿按钮画在里面,空白处是
+ * 窗口拖拽区。整条折叠后,红黄绿会浮到下面的 #nav-bar 上,所以要给
+ * nav-bar 左侧留出位置,否则会盖住「后退」按钮。 */
+#TabsToolbar {
+  visibility: collapse !important;
+}
+
+#nav-bar {
+  /* 给红黄绿三个按钮腾位置。若发现盖住或留白过多,调这个数值即可。 */
+  padding-left: 76px !important;
+  /* 标签栏没了就没有拖拽区了,让工具栏空白处可以拖动窗口。
+   * 工具栏上的按钮/地址栏自带 no-drag,点击不受影响。 */
+  -moz-window-dragging: drag;
+}
+
+/* 地址栏本身要能选中文字,不能被当成拖拽区 */
+#urlbar,
+#nav-bar toolbarbutton {
+  -moz-window-dragging: no-drag;
+}

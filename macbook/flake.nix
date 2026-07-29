@@ -21,6 +21,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # Official Rust dist binaries repackaged as coherent toolchains
+    # (nightly channel, per-component extensions). See home/rust.nix.
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     darwin-emacs = {
       url = "github:nix-giant/nix-darwin-emacs";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -63,6 +70,8 @@
       darwin-emacs.overlays.emacs
       darwin-emacs-packages.overlays.package
       (import ./overlays/emacs.nix)
+      # Provides pkgs.rust-bin.* — consumed by home/rust.nix.
+      inputs.rust-overlay.overlays.default
       # (removed 2026-07-25, the great teardown) deno doCheck=false and
       # python313Packages.jeepney install-check skip: cache-miss-era
       # relics; both packages ride Hydra's cache again.
@@ -149,6 +158,8 @@
     pkgs = import nixpkgs {
       inherit system overlays;
       config.allowUnfree = true;
+      # Required by androidenv (Android SDK/emulator in home/core.nix).
+      config.android_sdk.accept_license = true;
     };
 
     # my.pkgs = ./pkgs/default.nix

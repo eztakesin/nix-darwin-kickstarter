@@ -19,6 +19,7 @@
     ./btop.nix
     ./eza.nix
     ./fd.nix
+    ./firefox.nix
     ./gh.nix
     ./htop.nix
     ./hyfetch.nix
@@ -29,6 +30,7 @@
     ./neovim.nix
     ./ranger.nix
     ./ripgrep.nix
+    ./rust.nix
     ./skim.nix
     ./sops.nix
     ./tealdeer.nix
@@ -64,15 +66,10 @@
         source = ../dotfiles/aria2/trackers-list-aria2.sh;
         executable = true;
       };
-      # Firefox user-overrides.js (for arkenfox)
-      # NOTE: After first Firefox launch, you need to:
-      # 1. Find your profile dir: about:profiles
-      # 2. Clone arkenfox user.js into the profile dir
-      # 3. Symlink or copy this file there
-      # 4. Run: ./updater.sh && ./prefsCleaner.sh
-      ".config/firefox-user-overrides.js" = {
-        source = ../dotfiles/firefox/user-overrides.js;
-      };
+      # (removed) .config/firefox-user-overrides.js staging copy: home/
+      # firefox.nix now concatenates the pinned arkenfox template with
+      # these overrides at build time and writes the profile's user.js
+      # directly — no updater.sh/prefsCleaner.sh round trip.
 
       # Wallpaper
       "Pictures/wallpaper.png" = {
