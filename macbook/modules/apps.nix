@@ -123,6 +123,12 @@
       # FBReader = 1067172178;
     };
 
+    # Third-party taps. Needed for casks that are not in homebrew-cask
+    # core; nix-darwin runs `brew tap` for these before installing.
+    taps = [
+      "sikarugir-app/sikarugir"
+    ];
+
     brews = [
       "docker" # Container engine
       # "docker-compose" # Multi-container orchestration
@@ -164,7 +170,13 @@
       "claude" # Claude Desktop app
 
       "protonvpn"
-      # "sikarugir"
+      # Wine-based porting tool: wraps Windows programs/games as native
+      # .app bundles. From a third-party tap (see taps above), hence the
+      # fully-qualified name. Unrelated to Parallels — prl_naptd (the
+      # firewall prompt after running a Windows VM) belongs to Parallels'
+      # shared-network NAT/DHCP daemon and must stay allowed for VM
+      # networking to work.
+      "sikarugir-app/sikarugir/sikarugir"
       # "steam"
 
       # Fonts
