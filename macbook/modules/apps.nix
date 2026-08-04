@@ -125,9 +125,10 @@
 
     # Third-party taps. Needed for casks that are not in homebrew-cask
     # core; nix-darwin runs `brew tap` for these before installing.
-    taps = [
-      "sikarugir-app/sikarugir"
-    ];
+    # (removed 2026-07-30) sikarugir-app/sikarugir — Sikarugir fully
+    # uninstalled today (incl. the CS2.app wrapper); keeping the tap+cask
+    # here would silently reinstall it on the next darwin-rebuild switch.
+    taps = [];
 
     brews = [
       "docker" # Container engine
@@ -170,14 +171,14 @@
       "claude" # Claude Desktop app
 
       "protonvpn"
-      # Wine-based porting tool: wraps Windows programs/games as native
-      # .app bundles. From a third-party tap (see taps above), hence the
-      # fully-qualified name. Unrelated to Parallels — prl_naptd (the
-      # firewall prompt after running a Windows VM) belongs to Parallels'
-      # shared-network NAT/DHCP daemon and must stay allowed for VM
-      # networking to work.
-      "sikarugir-app/sikarugir/sikarugir"
+      # (removed 2026-07-30) sikarugir-app/sikarugir/sikarugir — see the
+      # taps note above. GPTK4 work now self-compiles wine instead
+      # (~/Workspace/gptk4-engine-builder, isolated x86_64 brew).
+      # Kept for reference: prl_naptd (the firewall prompt after running a
+      # Windows VM) belongs to Parallels' shared-network NAT/DHCP daemon
+      # and must stay allowed for VM networking to work.
       # "steam"
+      "battle-net"
 
       # Fonts
       # NOTE: Most fonts moved to Nix — see system.nix `fonts.packages`.

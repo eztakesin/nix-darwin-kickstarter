@@ -92,6 +92,13 @@
           pylsp-mypy = psuper.pylsp-mypy.overridePythonAttrs (_: {
             doCheck = false;
           });
+          # python-lsp-ruff 2.3.1: two tests assert ruff reports E402,
+          # but current ruff's rule behaviour changed and it no longer
+          # appears (2 failed / 12 passed). Same class as the two above:
+          # Hydra fails identically, so there is no cached drv to lose.
+          python-lsp-ruff = psuper.python-lsp-ruff.overridePythonAttrs (_: {
+            doCheck = false;
+          });
         };
       in {
         python3 = prev.python3.override (old: {inherit packageOverrides;});

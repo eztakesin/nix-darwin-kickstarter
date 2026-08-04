@@ -6,3 +6,7 @@ result/
 
 # Claude Code local overrides
 **/.claude/settings.local.json
+# NOTE: macbook/home/trading.nix is deliberately NOT listed here — it is
+# tracked as a harmless stub while the real machine-local content is
+# hidden from git via `git update-index --skip-worktree` (so local flake
+# builds still see it, but it can never be committed or pushed).

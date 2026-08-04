@@ -40,7 +40,13 @@
     ./zoxide.nix
     # emacs: intentionally not enabled — see overlays/emacs.nix and the
     # emacs-config flake input. (was: programs.emacs.package = pkgs.emacs-overlays)
-  ];
+  ]
+  # trading.nix: the repo carries only a do-nothing stub; the real
+  # machine-local content lives in the working tree behind
+  # `git update-index --skip-worktree`. Flake dirty-builds copy the
+  # WORKING-TREE content of tracked files, so local builds get the real
+  # module while clones only ever see (and import) the empty stub.
+  ++ lib.optional (builtins.pathExists ./trading.nix) ./trading.nix;
 
   # Home Manager needs a bit of information about you and the
   # paths it should manage.

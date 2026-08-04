@@ -38,6 +38,8 @@
       # python-lsp-black
       pyls-memestra
       pylsp-rope
+      # tests broken against newer ruff — doCheck=false in the flake's
+      # packageOverrides (same treatment as pipx/pylsp-mypy)
       python-lsp-ruff
       ipykernel
       epc
@@ -116,6 +118,8 @@
     claude-code
     # AI agent that brings the power of Gemini directly into your terminal
     gemini-cli
+    antigravity-cli
+    antigravity-ide
     # Parser generator tool and an incremental parsing library
     tree-sitter
 
