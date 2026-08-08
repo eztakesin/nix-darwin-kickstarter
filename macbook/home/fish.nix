@@ -56,6 +56,13 @@
       # 3. User tools (highest priority)
       fish_add_path -g $HOME/.cargo/bin
       fish_add_path -g $HOME/.local/bin
+      # Trading workspace binaries (hlguard / bot / panel / feed / news).
+      # Deliberately NOT `cargo install`ed: these are rebuilt constantly and
+      # a stale installed copy silently doing the old thing is exactly the
+      # failure mode this project cannot afford (a `hlguard` that predates a
+      # stop-loss fix would report coverage that no longer matches reality).
+      # Pointing at the build output means "what you run is what you built".
+      fish_add_path -g $HOME/Workspace/trading-workspace/target/release
 
       # ── kitty shell integration ──
       function mark_prompt_start --on-event fish_prompt
@@ -106,6 +113,65 @@
       # item "NAME-sops". secret-show NAME: Keychain → hex-decode
       # (`security -w` hex-encodes multiline payloads) → sops decrypt
       # (YubiKey PIN + touch; disaster path: paper key via SOPS_AGE_KEY).
+      # secret-group NAME MEMBER...: bundle several existing secrets into one
+      # multi-line secret, so loading the whole set costs ONE YubiKey touch
+      # instead of N. Payload format is "MEMBER:VALUE" per line — the same
+      # shape the trading panel parses from stdin.
+      #
+      # Bundle AGENT keys, not master keys. Agent keys are used on every
+      # panel launch and can only trade (never withdraw), so one touch for
+      # the set is a good trade. Master keys are used exactly once each (to
+      # approve an agent) and can move funds — bundling those would buy a
+      # convenience you never need at the price of unlocking every wallet's
+      # withdrawal rights in a single touch.
+      secret-group = {
+        description = "bundle several secrets into one (single YubiKey touch to load all)";
+        body = ''
+          set -l name $argv[1]
+          set -l members $argv[2..-1]
+          if test -z "$name" -o (count $members) -eq 0
+              echo "usage: secret-group NAME MEMBER..." >&2
+              echo "  e.g. secret-group hl-agents hl-agent-rabby6 hl-agent-rabby7" >&2
+              return 1
+          end
+          # Collect first: if any member fails to decrypt, abort before
+          # touching the destination. A half-written group is worse than none.
+          set -l lines
+          for m in $members
+              set -l v (secret-show $m)
+              or begin
+                  echo "cannot read secret '$m', aborting (nothing was written)" >&2
+                  return 1
+              end
+              if test -z "$v"
+                  echo "secret '$m' is empty, aborting" >&2
+                  return 1
+              end
+              # Strip a leading "hl-agent-" so the label matches the account
+              # name the panel shows (hl-agent-rabby6 -> rabby6).
+              set -l label (string replace -r '^hl-agent-' "" $m)
+              set -a lines "$label:$v"
+          end
+          # YAML block scalar: one key whose value is the multi-line payload.
+          # sops encrypts it as a single ciphertext, so secret-show returns
+          # it verbatim — same shape as any other secret.
+          begin
+              echo "$name: |"
+              for l in $lines
+                  echo "  $l"
+              end
+          end | sops --config ~/secrets/.sops.yaml -e --filename-override ~/secrets/$name.yaml /dev/stdin > ~/secrets/$name.yaml
+          or begin
+              set -e lines
+              echo "sops failed; ~/secrets/$name.yaml may be truncated" >&2
+              return 1
+          end
+          set -e lines
+          security add-generic-password -U -s $name-sops -a (whoami) -w (cat ~/secrets/$name.yaml | string collect)
+          echo "grouped "(count $members)" secrets: ~/secrets/$name.yaml + Keychain item $name-sops"
+          echo "load them all with one touch:  secret-show $name | panel"
+        '';
+      };
       secret-save = {
         description = "encrypt a secret with sops and store it in Apple Keychain";
         body = ''
