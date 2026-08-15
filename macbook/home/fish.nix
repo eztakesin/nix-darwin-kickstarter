@@ -155,18 +155,25 @@
           # YAML block scalar: one key whose value is the multi-line payload.
           # sops encrypts it as a single ciphertext, so secret-show returns
           # it verbatim — same shape as any other secret.
+          # Encrypt to a temp file first, then mv on success: a bare
+          # `> ~/secrets/$name.yaml` truncates the target BEFORE sops runs,
+          # so a failing sops would wipe an existing group (same guard as
+          # secret-save).
+          set -l tmp (mktemp)
           begin
               echo "$name: |"
               for l in $lines
                   echo "  $l"
               end
-          end | sops --config ~/secrets/.sops.yaml -e --filename-override ~/secrets/$name.yaml /dev/stdin > ~/secrets/$name.yaml
+          end | sops --config ~/secrets/.sops.yaml -e --filename-override ~/secrets/$name.yaml /dev/stdin > $tmp
           or begin
               set -e lines
-              echo "sops failed; ~/secrets/$name.yaml may be truncated" >&2
+              rm -f $tmp
+              echo "sops failed; ~/secrets/$name.yaml untouched" >&2
               return 1
           end
           set -e lines
+          mv $tmp ~/secrets/$name.yaml
           security add-generic-password -U -s $name-sops -a (whoami) -w (cat ~/secrets/$name.yaml | string collect)
           echo "grouped "(count $members)" secrets: ~/secrets/$name.yaml + Keychain item $name-sops"
           echo "load them all with one touch:  secret-show $name | panel"
@@ -186,12 +193,22 @@
               echo "empty input, aborting" >&2
               return 1
           end
-          echo "$name: $value" | sops -e --filename-override ~/secrets/$name.yaml /dev/stdin > ~/secrets/$name.yaml
+          # -c/--config pins the creation_rules source to ~/secrets/.sops.yaml
+          # so encryption works from ANY cwd. --filename-override only feeds
+          # the path_regex; it does NOT locate .sops.yaml (sops otherwise walks
+          # up from cwd and, outside ~/secrets, finds no rules and drops the key).
+          # Encrypt to a temp file first, then mv on success: a bare
+          # `> ~/secrets/$name.yaml` truncates the target BEFORE sops runs, so a
+          # failing sops would wipe an existing secret.
+          set -l tmp (mktemp)
+          echo "$name: $value" | sops --config ~/secrets/.sops.yaml -e --filename-override ~/secrets/$name.yaml /dev/stdin > $tmp
           or begin
               set -e value
+              rm -f $tmp
               return 1
           end
           set -e value
+          mv $tmp ~/secrets/$name.yaml
           security add-generic-password -U -s $name-sops -a (whoami) -w (cat ~/secrets/$name.yaml | string collect)
           echo "saved: ~/secrets/$name.yaml + Keychain item $name-sops"
         '';

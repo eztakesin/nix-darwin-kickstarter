@@ -117,7 +117,7 @@
     # Agentic coding tool that lives in your terminal, understands your codebase, and helps you code faster
     claude-code
     # AI agent that brings the power of Gemini directly into your terminal
-    gemini-cli
+    # gemini-cli
     antigravity-cli
     antigravity-ide
     # Parser generator tool and an incremental parsing library
@@ -202,11 +202,13 @@ in {
       # compile; Pkg works normally, packages live in ~/.julia).
       # Replaces the `julia` brew.
       julia-bin
+      # easylpac now ships its own Applications/EasyLPAC.app upstream
+      # (nixpkgs#545100, merged 2026-08-10) — the local easylpac-app
+      # wrapper was dropped to avoid a colliding bundle at the same path.
       easylpac
-      # .app launchers for the two GUI packages whose nixpkgs darwin
-      # builds ship no bundle (Spotlight/Launchpad visibility); official
-      # upstream icons, CLI bins still come from the packages above/below
-      my.pkgs.easylpac-app
+      # .app launcher for xournalpp, whose nixpkgs darwin build still
+      # ships no bundle (upstream icon; CLI bin comes from the package
+      # below). Second-wave PR pending — drop this too once it lands.
       my.pkgs.xournalpp-app
       # Modern media player for macOS
       iina

@@ -12,6 +12,7 @@
     ./starship.nix
     ./fish.nix
     ./kitty.nix
+    ./ssh.nix
 
     ./aria2.nix
     ./bash.nix
