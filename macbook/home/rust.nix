@@ -25,7 +25,16 @@
       toolchain.default.override {
         extensions = ["rust-src" "llvm-tools" "rust-analyzer"];
         # wasm32: EVM/blockchain tooling and wasm experiments.
-        targets = ["wasm32-unknown-unknown"];
+        #
+        # x86_64-linux-musl: cross-compile the trading workspace's `feed`
+        # collector for the Ubuntu VPS that records market data 24/7.
+        # musl rather than gnu so the artifact is fully static — that box
+        # is 1GB RAM / 20GB disk and should carry neither a Rust toolchain
+        # (~1.5GB) nor a glibc version to keep in sync. The target's std
+        # has to be present *here*; cargo-zigbuild below only supplies the
+        # linker, so without this line the build dies on "can't find crate
+        # for `std`" — which reads like a zig problem and isn't one.
+        targets = ["wasm32-unknown-unknown" "x86_64-unknown-linux-musl"];
       }
   );
 in {
@@ -45,6 +54,21 @@ in {
     cargo-expand
     # Coverage reports (needs the llvm-tools extension above)
     cargo-llvm-cov
+
+    # ── cross-compilation: aarch64-darwin → x86_64-linux ──
+    # zig ships a C compiler with bundled libc headers for every target it
+    # knows, so it can act as the cross-linker that a darwin host otherwise
+    # lacks — no cross-gcc, no Linux builder VM. cargo-zigbuild is the thin
+    # cargo wrapper that points rustc's linker at it.
+    #
+    # Only viable because everything being cross-built links pure-Rust TLS
+    # (rustls); a crate that pulled in OpenSSL would still need a
+    # cross-compiled C library and this pair would not be enough.
+    #
+    #   cargo zigbuild --release -p feed \
+    #     --target x86_64-unknown-linux-musl
+    cargo-zigbuild
+    zig
   ];
 
   # Cargo's global config. Kept as a plain home.file rather than

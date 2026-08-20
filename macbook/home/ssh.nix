@@ -45,6 +45,36 @@
         ControlPersist = "10m";
       };
 
+      # 同一台 tokyo, 换一把不需要触碰的钥匙 —— 给 feed 行情隧道专用
+      # (launchd.agents.trading-feed-tunnel, 见 trading.nix)。
+      #
+      # 为什么非要另起别名, 而不是给 tokyo 命令行加 -i: IdentitiesOnly=yes
+      # 只排除 **agent 递过来的**钥匙, 挡不住 ssh_config 里 IdentityFile
+      # 声明的那把。于是 tokyo 块的 id_ed25519_sk 照样被优先试 —— 拔了
+      # YubiKey 报 "device not found", 插着则**阻塞等触碰**。无人值守的
+      # 隧道两种都要不起, 而这是实测踩出来的, 不是理论顾虑。
+      #
+      # HostName 照旧留在仓库外: 在 ~/.ssh/config.d/hosts 里把那行写成
+      # `Host tokyo tokyo-feed` 即可, 两个别名共用同一个 IP。
+      #
+      # 远端那把公钥是被剥过权的 (authorized_keys):
+      #   restrict,port-forwarding,permitopen="127.0.0.1:8787",
+      #   permitlisten="127.0.0.1:1",command="/usr/sbin/nologin"
+      # 能力只剩转发一个只读行情端口, 所以明文无密码落盘是可接受的取舍。
+      #
+      # permitlisten 那半边是 08-16 测出来补的, 别删: `port-forwarding`
+      # 一次发还**两个**方向, 而 permitopen 只管 -L。少了它 -R 对任意端口
+      # 敞开 —— 当时写的注释声称"只剩一个端口", 逐字为假。
+      "tokyo-feed" = {
+        User = "root";
+        IdentityFile = "~/.ssh/id_ed25519_feedtunnel";
+        IdentitiesOnly = true;
+        # 必须独占控制通道。与 tokyo 共用会让交互式 `ssh tokyo` 复用到这条
+        # 受限连接上, 每条命令都撞 nologin —— 一个查起来很费劲的故障。
+        ControlMaster = "no";
+        ControlPath = "none";
+      };
+
       "us" = {
         User = "root";
         IdentityFile = "~/.ssh/id_ed25519_sk";

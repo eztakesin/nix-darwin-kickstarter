@@ -169,6 +169,7 @@
       # "sqlcl"
       # VS Code is managed by home-manager (see home/core.nix)
       "claude" # Claude Desktop app
+      "android-studio" # Android IDE
 
       "protonvpn"
       # (removed 2026-07-30) sikarugir-app/sikarugir/sikarugir — see the

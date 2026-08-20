@@ -122,6 +122,7 @@
     antigravity-ide
     # Parser generator tool and an incremental parsing library
     tree-sitter
+    azure-cli
 
     # Use your ProtonMail account with your local e-mail client
     protonmail-bridge

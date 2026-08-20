@@ -99,6 +99,21 @@
           python-lsp-ruff = psuper.python-lsp-ruff.overridePythonAttrs (_: {
             doCheck = false;
           });
+          # TEMPORARY mirror of nixpkgs#554405 (merged 2026-08-20, hours
+          # after this pin): test_verify's expected error regex no longer
+          # matches newer curl/http3 error text. DROP once the nixpkgs pin
+          # advances past the merge (the in-tree expression then carries
+          # these same skips and this override only forces a rebuild).
+          curl-cffi = psuper.curl-cffi.overridePythonAttrs (old: {
+            disabledTestPaths =
+              (old.disabledTestPaths or [])
+              ++ [
+                "tests/unittest/test_async_session.py::test_verify"
+                "tests/unittest/test_curl.py::test_verify"
+                "tests/unittest/test_requests.py::test_verify"
+                "tests/unittest/test_requests.py::test_delete_cookies"
+              ];
+          });
         };
       in {
         python3 = prev.python3.override (old: {inherit packageOverrides;});
@@ -148,6 +163,20 @@
               substituteInPlace neofetch \
                 --replace-fail "awk '/ wired/ { print \$4 }'" "awk '/Pages wired down/ { print \$4 }'"
             '';
+        });
+      })
+      # curl-impersonate ships its dylib with an @rpath install name on
+      # darwin (package lacks the standard fixDarwinDylibNames hook), so
+      # anything linking it — curl-cffi's _wrapper.abi3.so, and through
+      # it yt-dlp — records an @rpath reference with no LC_RPATH and
+      # dies at dlopen ("no LC_RPATH's found"). The hook rewrites the
+      # install name to the absolute store path, which consumers then
+      # record at link time. Upstreaming this same one-liner; drop the
+      # overlay once it lands.
+      (final: prev: {
+        curl-impersonate = prev.curl-impersonate.overrideAttrs (old: {
+          nativeBuildInputs =
+            (old.nativeBuildInputs or []) ++ [final.fixDarwinDylibNames];
         });
       })
       # (removed 2026-07-25) vscode asar-path overlay: upstream fix was
