@@ -165,18 +165,21 @@
             '';
         });
       })
-      # curl-impersonate ships its dylib with an @rpath install name on
-      # darwin (package lacks the standard fixDarwinDylibNames hook), so
-      # anything linking it — curl-cffi's _wrapper.abi3.so, and through
-      # it yt-dlp — records an @rpath reference with no LC_RPATH and
-      # dies at dlopen ("no LC_RPATH's found"). The hook rewrites the
-      # install name to the absolute store path, which consumers then
-      # record at link time. Upstreaming this same one-liner; drop the
-      # overlay once it lands.
+      # (removed 2026-08-22) curl-impersonate fixDarwinDylibNames overlay:
+      # our own NixOS/nixpkgs#554592 merged within a day and is in-tree
+      # at this pin — the dylib install name is absolute upstream now.
+      #
+      # nodejs-slim doCheck=false, RE-ADDED 2026-08-22 (same override we
+      # retired 2026-07-15 with "re-add only if nodejs must ever be built
+      # locally again"): Hydra lags the fresh 26.7.0 drv on this rev, so
+      # it builds locally, and parallel/test-dgram-udp6-link-local-address
+      # fails — an environment-dependent UDP6 link-local test (Starlink/
+      # VPN interface state), not a code defect; nixpkgs' nodejs has no
+      # per-test disable knob. REMOVE once Hydra's cache carries nodejs
+      # again (the override diverges the drv, forcing local builds).
       (final: prev: {
-        curl-impersonate = prev.curl-impersonate.overrideAttrs (old: {
-          nativeBuildInputs =
-            (old.nativeBuildInputs or []) ++ [final.fixDarwinDylibNames];
+        nodejs-slim_26 = prev.nodejs-slim_26.overrideAttrs (old: {
+          doCheck = false;
         });
       })
       # (removed 2026-07-25) vscode asar-path overlay: upstream fix was

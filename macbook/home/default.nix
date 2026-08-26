@@ -5,49 +5,50 @@
   ...
 }: {
   # import sub modules — one file per program, kitty.nix-style
-  imports = [
-    ./core.nix
-    ./git.nix
-    ./gpg.nix
-    ./starship.nix
-    ./fish.nix
-    ./kitty.nix
-    ./ssh.nix
+  imports =
+    [
+      ./core.nix
+      ./git.nix
+      ./gpg.nix
+      ./starship.nix
+      ./fish.nix
+      ./kitty.nix
+      ./ssh.nix
 
-    ./aria2.nix
-    ./bash.nix
-    ./bat.nix
-    ./btop.nix
-    ./eza.nix
-    ./fd.nix
-    ./firefox.nix
-    ./gh.nix
-    ./htop.nix
-    ./hyfetch.nix
-    ./joshuto.nix
-    ./jq.nix
-    ./lazygit.nix
-    ./less.nix
-    ./neovim.nix
-    ./ranger.nix
-    ./ripgrep.nix
-    ./rust.nix
-    ./skim.nix
-    ./sops.nix
-    ./tealdeer.nix
-    ./yazi.nix
-    ./yt-dlp.nix
-    ./zellij.nix
-    ./zoxide.nix
-    # emacs: intentionally not enabled — see overlays/emacs.nix and the
-    # emacs-config flake input. (was: programs.emacs.package = pkgs.emacs-overlays)
-  ]
-  # trading.nix: the repo carries only a do-nothing stub; the real
-  # machine-local content lives in the working tree behind
-  # `git update-index --skip-worktree`. Flake dirty-builds copy the
-  # WORKING-TREE content of tracked files, so local builds get the real
-  # module while clones only ever see (and import) the empty stub.
-  ++ lib.optional (builtins.pathExists ./trading.nix) ./trading.nix;
+      ./aria2.nix
+      ./bash.nix
+      ./bat.nix
+      ./btop.nix
+      ./eza.nix
+      ./fd.nix
+      ./firefox.nix
+      ./gh.nix
+      ./htop.nix
+      ./hyfetch.nix
+      ./joshuto.nix
+      ./jq.nix
+      ./lazygit.nix
+      ./less.nix
+      ./neovim.nix
+      ./ranger.nix
+      ./ripgrep.nix
+      ./rust.nix
+      ./skim.nix
+      ./sops.nix
+      ./tealdeer.nix
+      ./yazi.nix
+      ./yt-dlp.nix
+      ./zellij.nix
+      ./zoxide.nix
+      # emacs: intentionally not enabled — see overlays/emacs.nix and the
+      # emacs-config flake input. (was: programs.emacs.package = pkgs.emacs-overlays)
+    ]
+    # trading.nix: the repo carries only a do-nothing stub; the real
+    # machine-local content lives in the working tree behind
+    # `git update-index --skip-worktree`. Flake dirty-builds copy the
+    # WORKING-TREE content of tracked files, so local builds get the real
+    # module while clones only ever see (and import) the empty stub.
+    ++ lib.optional (builtins.pathExists ./trading.nix) ./trading.nix;
 
   # Home Manager needs a bit of information about you and the
   # paths it should manage.
