@@ -179,7 +179,7 @@
       # Windows VM) belongs to Parallels' shared-network NAT/DHCP daemon
       # and must stay allowed for VM networking to work.
       # "steam"
-      "battle-net"
+      # "battle-net"
 
       # Fonts
       # NOTE: Most fonts moved to Nix — see system.nix `fonts.packages`.

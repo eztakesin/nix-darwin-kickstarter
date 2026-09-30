@@ -16,7 +16,11 @@
     (pkgs.androidenv.composeAndroidPackages {
       includeEmulator = true;
       includeSystemImages = true;
-      platformVersions = ["36"];
+      # 36 是 AGP/Compose 的当前基线; 37 是实机 (Pixel 6a, Android 17) 的 API。
+      # 两个都要: compileSdk 停在 36 会把 Compose BOM 压在 2026.06.01
+      # (2026.08.00 硬要求 compileSdk 37 — 实测 AAR-metadata 报错),
+      # 而 targetSdk 与实机 API 对齐才拿得到新版行为。
+      platformVersions = ["36" "37"];
       systemImageTypes = ["google_apis_playstore"];
       abiVersions = ["arm64-v8a"];
     }).androidsdk;
@@ -38,8 +42,9 @@
       # python-lsp-black
       pyls-memestra
       pylsp-rope
-      # tests broken against newer ruff — doCheck=false in the flake's
-      # packageOverrides (same treatment as pipx/pylsp-mypy)
+      # (2026-09-30) back on the cached build: the flake-level doCheck
+      # skip it shared with pipx/pylsp-mypy was retired once 2.3.4
+      # passed its suite on Hydra.
       python-lsp-ruff
       ipykernel
       epc
@@ -49,6 +54,7 @@
       inflect
       # pyqt6
       pyqt6-sip
+      mnemonic
     ]);
   lspPackages = with pkgs; [
     # Language server for Bash
@@ -192,6 +198,25 @@
     uutils-findutils
   ];
 in {
+  # ── ANDROID_HOME (2026-08-29) ──
+  #
+  # androidenv 的复合 SDK 装在 `<store>/libexec/android-sdk`, 而 Gradle 与
+  # Android Studio 都靠 `ANDROID_HOME` (或已弃用的 ANDROID_SDK_ROOT) 找它。
+  # 不导出的后果不是"报错说找不到", 而是**工具悄悄回落到 `~/Library/Android/sdk`**
+  # —— 那个目录本机确实存在但**只有 platforms/, 没有 build-tools 也没有
+  # platform-tools**。于是构建会以一句莫名其妙的缺件报错收场, 而人会去那个
+  # 半残的目录里找原因。
+  #
+  # 两个变量都给: ANDROID_HOME 是现行的, ANDROID_SDK_ROOT 已被 Google 标记弃用
+  # 但仍有工具 (含某些 Gradle 插件版本) 只认它。
+  #
+  # ⚠ 路径**由 nix 表达式求值得到**, 不写死 /nix/store 的哈希 —— 写死的话
+  # 每次 SDK 组成变化 (加一个 platformVersion 就会) 都会指向一个已被 GC 的路径。
+  home.sessionVariables = {
+    ANDROID_HOME = "${androidSdk}/libexec/android-sdk";
+    ANDROID_SDK_ROOT = "${androidSdk}/libexec/android-sdk";
+  };
+
   home.packages = with pkgs;
     [
       myPython # Compiler & interpreters

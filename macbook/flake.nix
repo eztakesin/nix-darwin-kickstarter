@@ -76,51 +76,19 @@
       # python313Packages.jeepney install-check skip: cache-miss-era
       # relics; both packages ride Hydra's cache again.
       #
-      # pipx + pylsp-mypy doCheck=false SURVIVED the teardown, verified
-      # 2026-07-25: their upstream test suites are genuinely broken
-      # (pipx: 18 collection errors; pylsp-mypy: asserts on mypy's error
-      # text), so HYDRA cannot build them either — there is no cached
-      # plain drv to lose. These two stay local-built until upstream
-      # fixes their tests. Must override at the interpreter level:
-      # `pkgs.pipx` is `python3.pkgs.toPythonApplication python3.pkgs
-      # .pipx`, so the checkPhase runs inside `python3.pkgs.pipx`.
-      (final: prev: let
-        packageOverrides = pself: psuper: {
-          pipx = psuper.pipx.overridePythonAttrs (_: {
-            doCheck = false;
-          });
-          pylsp-mypy = psuper.pylsp-mypy.overridePythonAttrs (_: {
-            doCheck = false;
-          });
-          # python-lsp-ruff 2.3.1: two tests assert ruff reports E402,
-          # but current ruff's rule behaviour changed and it no longer
-          # appears (2 failed / 12 passed). Same class as the two above:
-          # Hydra fails identically, so there is no cached drv to lose.
-          python-lsp-ruff = psuper.python-lsp-ruff.overridePythonAttrs (_: {
-            doCheck = false;
-          });
-          # TEMPORARY mirror of nixpkgs#554405 (merged 2026-08-20, hours
-          # after this pin): test_verify's expected error regex no longer
-          # matches newer curl/http3 error text. DROP once the nixpkgs pin
-          # advances past the merge (the in-tree expression then carries
-          # these same skips and this override only forces a rebuild).
-          curl-cffi = psuper.curl-cffi.overridePythonAttrs (old: {
-            disabledTestPaths =
-              (old.disabledTestPaths or [])
-              ++ [
-                "tests/unittest/test_async_session.py::test_verify"
-                "tests/unittest/test_curl.py::test_verify"
-                "tests/unittest/test_requests.py::test_verify"
-                "tests/unittest/test_requests.py::test_delete_cookies"
-              ];
-          });
-        };
-      in {
-        python3 = prev.python3.override (old: {inherit packageOverrides;});
-        # python314 is a separate attr — home/core.nix builds myPython
-        # from it, so it needs the same overrides.
-        python314 = prev.python314.override (old: {inherit packageOverrides;});
-      })
+      # (removed 2026-09-30) the python packageOverrides overlay — the
+      # last of the cache-miss-era test skips. All four packages ride
+      # Hydra's cache again at this pin (python3 = 3.14.7), verified by
+      # probing the clean drvs: pipx 1.16.6 and pylsp-mypy 0.8.0 (test
+      # suites were broken upstream since 2026-07), python-lsp-ruff 2.3.4
+      # (E402 assertions vs newer ruff), and the curl-cffi test_verify
+      # mirror of nixpkgs#554405 (curl-cffi 0.16.0 passes its suite).
+      # If a python test skip is ever needed again: override at the
+      # interpreter level via `python3.override { packageOverrides }`
+      # (pkgs.pipx is toPythonApplication of python3.pkgs.pipx, so the
+      # checkPhase runs inside the python package set), and override
+      # python314 too — it is a separate attr that home/core.nix's
+      # myPython is built from.
       #
       # (removed 2026-07-25) THE LIBFFI SCAFFOLD — libffiAppleFixed
       # (-no_fixup_chains relink) + python314FixedFfi (recursive self,
@@ -169,19 +137,12 @@
       # our own NixOS/nixpkgs#554592 merged within a day and is in-tree
       # at this pin — the dylib install name is absolute upstream now.
       #
-      # nodejs-slim doCheck=false, RE-ADDED 2026-08-22 (same override we
-      # retired 2026-07-15 with "re-add only if nodejs must ever be built
-      # locally again"): Hydra lags the fresh 26.7.0 drv on this rev, so
-      # it builds locally, and parallel/test-dgram-udp6-link-local-address
-      # fails — an environment-dependent UDP6 link-local test (Starlink/
-      # VPN interface state), not a code defect; nixpkgs' nodejs has no
-      # per-test disable knob. REMOVE once Hydra's cache carries nodejs
-      # again (the override diverges the drv, forcing local builds).
-      (final: prev: {
-        nodejs-slim_26 = prev.nodejs-slim_26.overrideAttrs (old: {
-          doCheck = false;
-        });
-      })
+      # (removed 2026-09-30, second retirement) nodejs-slim doCheck=false:
+      # Hydra carries the clean nodejs-slim 26.10.0 at this pin. It was
+      # re-added 2026-08-22 only because 26.7.0 lagged the cache and
+      # parallel/test-dgram-udp6-link-local-address fails on this
+      # machine's IPv6 link-local state (Starlink/VPN) — re-add the same
+      # override if nodejs ever has to build locally again.
       # (removed 2026-07-25) vscode asar-path overlay: upstream fix was
       # our own NixOS/nixpkgs#543899, merged 07-21, in-tree at 6d120041.
       # (removed 2026-07-25) the nixpkgs-stable pin bridge (unar,

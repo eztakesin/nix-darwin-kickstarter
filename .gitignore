@@ -1,6 +1,8 @@
 result
 result/
 
+manuals/error.log
+
 # macOS
 .DS_Store
 
