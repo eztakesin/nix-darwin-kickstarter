@@ -240,8 +240,15 @@ in {
       iina
       # Vector graphics editor
       inkscape-with-extensions
-      # Full-featured download manager, rebuilt from scratch with Tauri 2, Vue 3, and Rust
-      motrix-next
+      # Full-featured download manager, rebuilt from scratch with Tauri 2,
+      # Vue 3, and Rust. Upstream renamed Motrix Next -> Rayburst (v4.0.0,
+      # 2026-09-24); nixpkgs#566586 (open, approved) renames the attr and
+      # turns `motrix-next` into a hard throw. `or` picks rayburst as soon
+      # as the pin carries it, without ever evaluating the throw alias.
+      # Heads-up for that day: the bundle becomes Rayburst.app with a new
+      # bundle id — Dock pin, Spotlight entry and task history don't carry
+      # over.
+      (pkgs.rayburst or pkgs.motrix-next)
       # General-purpose media player
       mpv
       # Proton Mail official desktop app (repack of the upstream dmg).

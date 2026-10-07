@@ -133,6 +133,22 @@
             '';
         });
       })
+      # clipboard-jh: nixpkgs#569550 (merged 2026-10-03) pinned
+      # gcc15Stdenv unconditionally to dodge GCC 16 on Linux, but only
+      # x86_64-linux was reviewed — on darwin upstream's CMake passes the
+      # clang-only -fobjc-arc for its Objective-C++ NSPasteboard code, so
+      # g++ dies ("unrecognized command-line option '-fobjc-arc'") and
+      # Hydra has no darwin build. Swapping the clang stdenv back in
+      # yields the exact drv Hydra built before #569550, so this
+      # substitutes from cache instead of compiling (verified on-device:
+      # cb copy / cb paste round-trip with pbpaste). Upstream fix is
+      # open as nixpkgs#570577; DROP once the pin's clean clipboard-jh
+      # is cached again (probe: the no-overlay outPath on cache.nixos.org).
+      (final: prev: {
+        clipboard-jh = prev.clipboard-jh.override {
+          gcc15Stdenv = prev.stdenv;
+        };
+      })
       # (removed 2026-08-22) curl-impersonate fixDarwinDylibNames overlay:
       # our own NixOS/nixpkgs#554592 merged within a day and is in-tree
       # at this pin — the dylib install name is absolute upstream now.
