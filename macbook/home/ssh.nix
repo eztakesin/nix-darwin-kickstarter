@@ -45,8 +45,19 @@
         ControlPersist = "10m";
       };
 
-      # 同一台 tokyo, 换一把不需要触碰的钥匙 —— 给 feed 行情隧道专用
-      # (launchd.agents.trading-feed-tunnel, 见 trading.nix)。
+      # 只读、免触碰的钥匙, 给无人值守的定时同步用。远端 authorized_keys
+      # 把它限制为对单个目录的只读 rsync (rrsync -ro): 写入和 shell 都会被
+      # 拒绝 (已实测)。
+      "tokyo-ro" = {
+        User = "root";
+        IdentityFile = "~/.ssh/id_ed25519_outerloop";
+        IdentitiesOnly = true;
+        ControlMaster = "no";
+        ControlPath = "none";
+      };
+
+      # 同一台 tokyo, 换一把不需要触碰的钥匙, 给一条无人值守的端口转发
+      # 隧道用 (由机器本地的模块启动, 不在本仓库)。
       #
       # 为什么非要另起别名, 而不是给 tokyo 命令行加 -i: IdentitiesOnly=yes
       # 只排除 **agent 递过来的**钥匙, 挡不住 ssh_config 里 IdentityFile
@@ -55,16 +66,14 @@
       # 隧道两种都要不起, 而这是实测踩出来的, 不是理论顾虑。
       #
       # HostName 照旧留在仓库外: 在 ~/.ssh/config.d/hosts 里把那行写成
-      # `Host tokyo tokyo-feed` 即可, 两个别名共用同一个 IP。
+      # `Host tokyo tokyo-feed tokyo-ro` 即可, 几个别名共用同一个 IP。
       #
-      # 远端那把公钥是被剥过权的 (authorized_keys):
-      #   restrict,port-forwarding,permitopen="127.0.0.1:8787",
-      #   permitlisten="127.0.0.1:1",command="/usr/sbin/nologin"
-      # 能力只剩转发一个只读行情端口, 所以明文无密码落盘是可接受的取舍。
+      # 远端那把公钥是被剥过权的 (authorized_keys): restrict 加上只放行
+      # 一个本地端口的 permitopen, 再配 permitlisten 和 nologin, 所以明文
+      # 无密码落盘是可接受的取舍。
       #
-      # permitlisten 那半边是 08-16 测出来补的, 别删: `port-forwarding`
-      # 一次发还**两个**方向, 而 permitopen 只管 -L。少了它 -R 对任意端口
-      # 敞开 —— 当时写的注释声称"只剩一个端口", 逐字为假。
+      # permitlisten 别删: `port-forwarding` 一次发还**两个**方向, 而
+      # permitopen 只管 -L; 少了它 -R 对任意端口敞开 (实测补上的)。
       "tokyo-feed" = {
         User = "root";
         IdentityFile = "~/.ssh/id_ed25519_feedtunnel";

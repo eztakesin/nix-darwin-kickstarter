@@ -128,7 +128,10 @@
     antigravity-ide
     # Parser generator tool and an incremental parsing library
     tree-sitter
-    azure-cli
+    # Azure CLI — off for now (2026-10-20). On current nixpkgs it fails
+    # evaluation (fabric is marked broken by invoke 3, NixOS/nixpkgs#575989);
+    # re-enabling it needs the invoke pin described in flake.nix until then.
+    # azure-cli
 
     # Use your ProtonMail account with your local e-mail client
     protonmail-bridge
@@ -241,14 +244,10 @@ in {
       # Vector graphics editor
       inkscape-with-extensions
       # Full-featured download manager, rebuilt from scratch with Tauri 2,
-      # Vue 3, and Rust. Upstream renamed Motrix Next -> Rayburst (v4.0.0,
-      # 2026-09-24); nixpkgs#566586 (open, approved) renames the attr and
-      # turns `motrix-next` into a hard throw. `or` picks rayburst as soon
-      # as the pin carries it, without ever evaluating the throw alias.
-      # Heads-up for that day: the bundle becomes Rayburst.app with a new
-      # bundle id — Dock pin, Spotlight entry and task history don't carry
-      # over.
-      (pkgs.rayburst or pkgs.motrix-next)
+      # Vue 3, and Rust — formerly Motrix Next (renamed upstream in v4.0.0;
+      # nixpkgs#566586). The bundle is Rayburst.app with a new bundle id,
+      # so Dock pin, Spotlight entry and task history did not carry over.
+      rayburst
       # General-purpose media player
       mpv
       # Proton Mail official desktop app (repack of the upstream dmg).

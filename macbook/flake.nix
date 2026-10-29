@@ -83,12 +83,11 @@
       # suites were broken upstream since 2026-07), python-lsp-ruff 2.3.4
       # (E402 assertions vs newer ruff), and the curl-cffi test_verify
       # mirror of nixpkgs#554405 (curl-cffi 0.16.0 passes its suite).
-      # If a python test skip is ever needed again: override at the
-      # interpreter level via `python3.override { packageOverrides }`
-      # (pkgs.pipx is toPythonApplication of python3.pkgs.pipx, so the
-      # checkPhase runs inside the python package set), and override
-      # python314 too — it is a separate attr that home/core.nix's
-      # myPython is built from.
+      # Python package fixes go through `pythonPackagesExtensions`: it
+      # patches every python3xxPackages set at once, so python3.pkgs
+      # (vscode extensions, pipx's
+      # toPythonApplication) and the separate python314 attr that
+      # home/core.nix's myPython is built from can't drift apart.
       #
       # (removed 2026-07-25) THE LIBFFI SCAFFOLD — libffiAppleFixed
       # (-no_fixup_chains relink) + python314FixedFfi (recursive self,
@@ -133,22 +132,51 @@
             '';
         });
       })
-      # clipboard-jh: nixpkgs#569550 (merged 2026-10-03) pinned
-      # gcc15Stdenv unconditionally to dodge GCC 16 on Linux, but only
-      # x86_64-linux was reviewed — on darwin upstream's CMake passes the
-      # clang-only -fobjc-arc for its Objective-C++ NSPasteboard code, so
-      # g++ dies ("unrecognized command-line option '-fobjc-arc'") and
-      # Hydra has no darwin build. Swapping the clang stdenv back in
-      # yields the exact drv Hydra built before #569550, so this
-      # substitutes from cache instead of compiling (verified on-device:
-      # cb copy / cb paste round-trip with pbpaste). Upstream fix is
-      # open as nixpkgs#570577; DROP once the pin's clean clipboard-jh
-      # is cached again (probe: the no-overlay outPath on cache.nixos.org).
+      # (removed 2026-10-29) clipboard-jh clang-stdenv overlay: the upstream
+      # fix nixpkgs#570577 reached the pin and the clean build is cached.
+      # (removed 2026-10-20) debugpy test_lldb_command mirror: nixpkgs#572564
+      # reached the pin (hardcode-lldb.patch now updates the test too) and
+      # the clean debugpy 1.8.22 is cached again.
+      #
+      # qbittorrent-enhanced on darwin: Qt 6.12 (nixpkgs 67c8881f, 2026-10-08)
+      # marks Q_OS_MAC deprecated, and qBittorrent's -pedantic-errors build
+      # turns the two remaining `#ifdef Q_OS_MAC` (log/loglistview.cpp,
+      # optionsdialog.cpp; macOS-only code) into hard errors, so Hydra has no
+      # darwin build. Mirrors upstream qBittorrent 6164ed1178 ("Replace
+      # deprecated Q_OS_MAC macro"), which is on master only — not in 5.2.4
+      # nor in Enhanced 5.2.4.10. DROP once the pin's clean
+      # qbittorrent-enhanced is cached again.
       (final: prev: {
-        clipboard-jh = prev.clipboard-jh.override {
-          gcc15Stdenv = prev.stdenv;
-        };
+        qbittorrent-enhanced = prev.qbittorrent-enhanced.overrideAttrs (old: {
+          postPatch =
+            (old.postPatch or "")
+            + ''
+              sed -i -E 's/\bQ_OS_MAC\b/Q_OS_MACOS/' \
+                src/gui/log/loglistview.cpp src/gui/optionsdialog.cpp
+            '';
+        });
       })
+      # cargo-llvm-cov 0.9.0: its test suite instruments fixture crates with
+      # nixpkgs' rustc and runs them; since rustc 1.98.1 -> 1.99.0 (this pin)
+      # those binaries SIGSEGV (14 of 20 tests), and Hydra has no build on
+      # darwin or Linux. The package's own header notes the tool keeps working
+      # when that happens — real use here goes through the rust-overlay
+      # nightly and its llvm-tools, verified with a coverage run. DROP once the
+      # pin's clean cargo-llvm-cov is cached again.
+      (final: prev: {
+        cargo-llvm-cov = prev.cargo-llvm-cov.overrideAttrs {doCheck = false;};
+      })
+      # (removed 2026-10-20) azure-cli invoke pin, together with azure-cli
+      # itself (home/core.nix). nixpkgs bumped invoke to 3.0.3 (c1aaa60e)
+      # and marked fabric broken for invoke >= 3 (fabric/fabric#2376), so
+      # azure-cli fails evaluation (NixOS/nixpkgs#575989); its appservice
+      # module imports fabric and invoke at module level. If azure-cli comes
+      # back before that is fixed: a pythonPackagesExtensions overlay that
+      # pins invoke to 2.2.1 (fetchPypi, sha256-UVv0m0pIkyt5sCRZA0jaIvOcSULf
+      # +ZGtH7i4uuob5wc=) only where `pyfinal ? azure-cli-core`, i.e. inside
+      # azure-cli's private python set. Pinning only fabric's invoke clashes
+      # with the one paramiko propagates (pythonCatchConflictsHook), and a
+      # global pin rebuilds every paramiko dependent that is otherwise cached.
       # (removed 2026-08-22) curl-impersonate fixDarwinDylibNames overlay:
       # our own NixOS/nixpkgs#554592 merged within a day and is in-tree
       # at this pin — the dylib install name is absolute upstream now.
