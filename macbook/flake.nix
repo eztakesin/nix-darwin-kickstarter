@@ -98,40 +98,11 @@
       # which reached nixpkgs-unstable at 6d120041. Plain python3 verified
       # on-device: `import ctypes` clean from the binary cache.
       # History: git log around 2ac9390..bab2d63, and issue #541367.
-      # highlight: nixpkgs carries shellscript-crash-fix.patch but upstream
-      # already merged it into 4.20, so the patch fails with "Reversed (or
-      # previously applied) patch detected". Drop it.
-      (final: prev: {
-        highlight = prev.highlight.overrideAttrs (old: {
-          patches =
-            builtins.filter
-            (p: builtins.match ".*shellscript-crash-fix.*" (toString p) == null)
-            (old.patches or []);
-        });
-      })
-      # neofetch (hyfetch's neowofetch) parses vm_stat with a loose
-      # `/ wired/` awk pattern; macOS 27 added a "Pages tag-storage non-tag
-      # wired:" line that also matches, so pages_wired becomes two lines,
-      # the memory arithmetic explodes, and the script dies with exit 1 —
-      # silently, because neofetch itself runs `exec 2>/dev/null`.
-      # Tighten the pattern to the exact line. Worth reporting upstream to
-      # hyfetch.
-      # (The yt-dlp/pipx/yubikey-manager FixedFfi migrations that lived
-      # here left with the scaffold — plain builds ride the cache again.)
-      # The --replace-fail below doubles as a tripwire: hyfetch 2.1.0
-      # still ships the old pattern; the release containing our merged
-      # fix (hyfetch#526) will make this build FAIL LOUDLY — that's the
-      # signal to delete this overlay.
-      (final: prev: {
-        hyfetch = prev.hyfetch.overrideAttrs (old: {
-          postPatch =
-            (old.postPatch or "")
-            + ''
-              substituteInPlace neofetch \
-                --replace-fail "awk '/ wired/ { print \$4 }'" "awk '/Pages wired down/ { print \$4 }'"
-            '';
-        });
-      })
+      # (removed 2026-11-25) highlight patch-drop overlay: highlight 4.21 no
+      # longer carries shellscript-crash-fix.patch and the clean build is cached.
+      # (removed 2026-11-25) hyfetch neofetch wired-memory overlay: hyfetch 2.1.1
+      # includes upstream fix hyfetch#526 (tripped our --replace-fail guard) and
+      # the clean build is cached.
       # (removed 2026-10-29) clipboard-jh clang-stdenv overlay: the upstream
       # fix nixpkgs#570577 reached the pin and the clean build is cached.
       # (removed 2026-10-20) debugpy test_lldb_command mirror: nixpkgs#572564
@@ -156,15 +127,25 @@
             '';
         });
       })
-      # cargo-llvm-cov 0.9.0: its test suite instruments fixture crates with
-      # nixpkgs' rustc and runs them; since rustc 1.98.1 -> 1.99.0 (this pin)
-      # those binaries SIGSEGV (14 of 20 tests), and Hydra has no build on
-      # darwin or Linux. The package's own header notes the tool keeps working
-      # when that happens — real use here goes through the rust-overlay
-      # nightly and its llvm-tools, verified with a coverage run. DROP once the
-      # pin's clean cargo-llvm-cov is cached again.
+      # (removed 2026-11-25) cargo-llvm-cov doCheck=false overlay: clean
+      # cargo-llvm-cov 0.9.2 builds on Hydra and is cached again.
+      # joshuto 0.9.9: cargoSetupHook now globally exports LIBGIT2_NO_VENDOR=1
+      # and LIBZ_SYS_STATIC=0, but joshuto locks libgit2-sys 0.16.2+1.7.2
+      # (requiring libgit2 >= 1.7.2, < 1.8.0) while nixpkgs ships libgit2 1.9.7,
+      # and nixpkgs' joshuto package wasn't updated (same pattern as nixpkgs'
+      # amp/yek/klipper-estimator). Override LIBGIT2_NO_VENDOR=0 in preBuild to
+      # build the vendored libgit2 1.7.2 copy, and provide pkg-config + zlib for
+      # libz-sys. DROP once nixpkgs fixes joshuto and Hydra caches it again.
       (final: prev: {
-        cargo-llvm-cov = prev.cargo-llvm-cov.overrideAttrs {doCheck = false;};
+        joshuto = prev.joshuto.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or []) ++ [final.pkg-config];
+          buildInputs = (old.buildInputs or []) ++ [final.zlib];
+          preBuild =
+            (old.preBuild or "")
+            + ''
+              export LIBGIT2_NO_VENDOR=0
+            '';
+        });
       })
       # (removed 2026-10-20) azure-cli invoke pin, together with azure-cli
       # itself (home/core.nix). nixpkgs bumped invoke to 3.0.3 (c1aaa60e)

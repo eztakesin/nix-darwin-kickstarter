@@ -172,6 +172,7 @@
       "android-studio" # Android IDE
 
       "protonvpn"
+      "tapmap"
       # (removed 2026-07-30) sikarugir-app/sikarugir/sikarugir — see the
       # taps note above. GPTK4 work now self-compiles wine instead
       # (~/Workspace/gptk4-engine-builder, isolated x86_64 brew).

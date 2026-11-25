@@ -91,6 +91,23 @@
         ServerAliveCountMax = 30;
       };
 
+      # wa: 走 GPG 的 YubiKey 认证子钥 (gpg-agent 提供, 见 gpg.nix), 不用 FIDO2。
+      # IdentityFile 指向 *公钥* —— 私钥在卡里, ssh 拿这个公钥去 agent 里挑钥匙;
+      # IdentitiesOnly 避免 agent 先递其他钥匙撞 MaxAuthTries。
+      # 公钥由 `ssh-add -L | grep cardno > ~/.ssh/yubikey.pub` 生成。
+      "wa" = {
+        User = "root";
+        IdentityFile = "~/.ssh/yubikey.pub";
+        IdentitiesOnly = true;
+        ServerAliveInterval = 4;
+        ServerAliveCountMax = 30;
+        # kitty 的 TERM=xterm-kitty 远端没有 terminfo, 会让 debconf/ncurses
+        # 崩 (apt upgrade 卡 openssh-server 就是这么来的)。OpenSSH ≥ 8.7 支持
+        # 用 SetEnv 覆盖 TERM。home-manager 的 SetEnv 渲染器吃 attrset
+        # (mapAttrsToList → `SetEnv TERM="..."`), 字符串/列表都会报类型错。
+        SetEnv = {TERM = "xterm-256color";};
+      };
+
       "github.com" = {
         User = "git";
         IdentityFile = "~/.ssh/id_ed25519_sk";

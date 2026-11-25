@@ -5,7 +5,29 @@
   useremail,
   my,
   ...
-}: {
+}: let
+  # Wrap git so every commit/tag/merge/rebase records UTC (+0000) instead of
+  # leaking the host's local timezone (Asia/Bangkok, +0700).
+  #
+  # Wrapping the package (rather than a shell alias/function) covers all
+  # callers: fish/bash, lazygit, neovim/fugitive, GUI editors, scripts,
+  # git aliases (`git cmt`/`git ca`), and `git -C ... commit`.
+  # `makeBinaryWrapper` avoids /bin/sh startup overhead on frequent status
+  # calls. `--set TZ UTC` pins UTC unconditionally even if a parent process
+  # exports TZ; OpenPGP signatures store UTC epoch seconds (RFC 4880), so
+  # `commit.gpgSign` is unaffected.
+  gitUtc = pkgs.symlinkJoin {
+    name = "git-utc-${pkgs.git.version}";
+    paths = [pkgs.git];
+    nativeBuildInputs = [pkgs.makeBinaryWrapper];
+    postBuild = ''
+      wrapProgram $out/bin/git --set TZ UTC
+    '';
+    # home-manager's programs.git calls `lib.getExe cfg.package`, which reads
+    # `meta.mainProgram` (not propagated by symlinkJoin automatically).
+    meta = pkgs.git.meta;
+  };
+in {
   # `programs.git` will generate the config file: ~/.config/git/config
   # to make git use this config file, `~/.gitconfig` should not exist!
   #
@@ -23,6 +45,7 @@
 
   programs.git = {
     enable = true;
+    package = gitUtc;
     lfs.enable = true;
 
     ignores = ["*~" "*.swp" "\\#*\\#" ".\\#*" ".vim/coc-settings.json" ".vscode" ".envrc"]; # vim swap file & emacs

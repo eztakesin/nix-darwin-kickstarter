@@ -101,6 +101,7 @@
     rustscan
     # Tool for retrieving files using HTTP, HTTPS, and FTP
     wget
+    nym
 
     # Command Line Interface to Rich
     rich-cli
@@ -124,8 +125,12 @@
     claude-code
     # AI agent that brings the power of Gemini directly into your terminal
     # gemini-cli
-    antigravity-cli
-    antigravity-ide
+    # antigravity-cli
+    # antigravity-ide
+    # AI coding agent built for the terminal
+    opencode
+    # AI coding agent desktop client
+    opencode-desktop
     # Parser generator tool and an incremental parsing library
     tree-sitter
     # Azure CLI — off for now (2026-10-20). On current nixpkgs it fails
@@ -184,6 +189,7 @@
     tailspin
     # Text-mode web browser with tables/frames support
     w3m
+    ffmpeg-full
 
     # Portable, fast and modular toolkit for Ethereum application development (forge/cast/anvil/chisel)
     foundry
